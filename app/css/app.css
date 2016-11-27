@@ -68,3 +68,19 @@ div#top, h1#menu, h1#book {
     top: 0;
     bottom: auto;
 }
+
+.pagination {
+    z-index: 99999;
+}
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+    background-color: #d48d4b;
+    border-color: #c37334;
+}
+
+.pagination>li>a, .pagination>li>span {
+    color: #b46e30;
+}
+
+.pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover {
+    color: #b46e30;
+}
