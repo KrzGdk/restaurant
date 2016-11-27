@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="shopAdminApp">
+
+<head>
+  <meta charset="utf-8">
+  <title>Sklep internetowy - panel administracyjny</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="css/app.css" type="text/css">
+
+  <script type="text/javascript" src="js/lib/jquery-3.1.1.js"></script>
+  <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/lib/angular.js"></script>
+  <script type="text/javascript" src="js/lib/angular-route.js"></script>
+  <script type="text/javascript" src="js/lib/angular-resource.js"></script>
+  <script type="text/javascript" src="js/lib/angular-animate.js"></script>
+  <script type="text/javascript" src="js/lib/angular-cookies.js"></script>
+  <script type="text/javascript" src="js/lib/ui-bootstrap-tpls-2.2.0.js"></script>
+  <script type="text/javascript" src="js/lib/i18n/angular-locale_pl-pl.js"></script>
+
+  <script type="text/javascript" src="js/admin/app.js"></script>
+  <script type="text/javascript" src="js/admin/controllers.js"></script>
+  <script type="text/javascript" src="js/admin/services.js"></script>
+
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <header class="col-lg-10 col-lg-offset-1">
+      <h1 class="text-center">
+        Sklep spożywczy - panel administracyjny
+      </h1>
+    </header>
+  </div>
+  <div class="row" style="margin-top: 25px;">
+    <div class="col-lg-10 col-lg-offset-1">
+      <div ng-view></div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+
+</html>
