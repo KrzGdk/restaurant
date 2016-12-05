@@ -84,3 +84,50 @@ div#top, h1#menu, h1#book {
 .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover {
     color: #b46e30;
 }
+
+.tableSvg {
+
+}
+
+.tableSvg:hover {
+    fill: #b46e30;
+    cursor: pointer;
+}
+
+.tableSvg-selected {
+    fill: #5cb85c;
+}
+
+.tableSvg-selected:hover {
+    fill: #5cb85c;
+}
+
+.tableSvg-reserved {
+    fill: #656565;
+}
+
+.tableSvg-reserved:hover {
+    fill: #656565;
+    cursor: default;
+}
+
+
+.glyphicon-star, .glyphicon-star-empty {
+    color: #97922a;
+}
+
+.symbol {
+    display: inline-block;
+    border-radius: 50%;
+    border: 5px double white;
+    width: 30px;
+    height: 30px;
+}
+
+.tableSvg text {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

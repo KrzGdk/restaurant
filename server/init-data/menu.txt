@@ -1,7 +1,0 @@
-db.menu.insert({"name": "Ravioli z krabem","thumbnail": "ravioli.jpg"})
-db.menu.insert({"name": "Grillowany stek z wołowiny z warzywami","thumbnail": "stek.jpg"})
-db.menu.insert({"name": "Pikantne krewetki z wanilią","thumbnail": "krewetki.jpg"})
-db.menu.insert({"name": "Makaron soba ze smażonymi małżami w stylu chilli basil","thumbnail": "soba.jpg"})
-db.menu.insert({"name": "Turbot z ciepłą sałatką z kopru włoskiego","thumbnail": "turbot.jpg"})
-db.menu.insert({"name": "Imbirowa wołowina z musem z groszku","thumbnail": "wolowina.jpg"})
-db.menu.insert({"name": "Mus z fasolki i ciecierzycy podany z warzywami oraz galaretką z curry","thumbnail": "mus.jpg"})

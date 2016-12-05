@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Ravioli z krabem",
+    "thumbnail": "ravioli.jpg"
+  },
+  {
+    "name": "Grillowany stek z wołowiny z warzywami",
+    "thumbnail": "stek.jpg"
+  },
+  {
+    "name": "Pikantne krewetki z wanilią",
+    "thumbnail": "krewetki.jpg"
+  },
+  {
+    "name": "Makaron soba ze smażonymi małżami w stylu chilli basil",
+    "thumbnail": "soba.jpg"
+  },
+  {
+    "name": "Turbot z ciepłą sałatką z kopru włoskiego",
+    "thumbnail": "turbot.jpg"
+  },
+  {
+    "name": "Imbirowa wołowina z musem z groszku",
+    "thumbnail": "wolowina.jpg"
+  },
+  {
+    "name": "Mus z fasolki i ciecierzycy podany z warzywami oraz galaretką z curry",
+    "thumbnail": "mus.jpg"
+  }
+]
