@@ -3,10 +3,11 @@ var appControllers = angular.module('appControllers', []);
 appControllers.controller('MainCtrl',
     function ($scope, $routeParams, $http, $filter, Menu, $uibModal) {
         $scope.menu = Menu.query([], function () {
-            $scope.pageChanged()
+            $scope.pageChanged();
+            $scope.pageChangedReserving();
         });
 
-        //pagination
+        // menu pagination
         $scope.itemsPerPage = 6;
         $scope.paginatedMenu = $scope.menu.slice(0, $scope.itemsPerPage);
         $scope.currentPage = 1;
@@ -19,6 +20,23 @@ appControllers.controller('MainCtrl',
             $scope.paginatedMenu = $scope.menu.slice(begin, end);
         };
 
+        // reserving menu pagination
+        $scope.reservingItemsPerPage = 4;
+        $scope.filteredReservingMenu = $scope.menu.slice(0, $scope.reservingItemsPerPage);
+        $scope.reservingCurrentPage = 1;
+        $scope.totalItems = $scope.menu.length;
+
+        $scope.pageChangedReserving = function paginate() {
+            var begin = (($scope.reservingCurrentPage - 1) * $scope.reservingItemsPerPage), end = begin + $scope.reservingItemsPerPage;
+            $scope.totalItems = $scope.menu.length;
+            $scope.filteredReservingMenu = $scope.menu.slice(begin, end);
+            var mod = $scope.filteredReservingMenu.length % $scope.reservingItemsPerPage;
+            while (mod != 0) {
+                $scope.filteredReservingMenu.push({name:""});
+                mod = $scope.filteredReservingMenu.length % $scope.reservingItemsPerPage;
+            }
+        };
+
         // SVG
         $scope.svg = {
             tableHeight: 12,
@@ -29,7 +47,7 @@ appControllers.controller('MainCtrl',
 
         $scope.reservationDate = new Date();
         $scope.reservedTables = [];
-        $scope.reservedDishes = [];
+        $scope.reservedDishes = {};
 
         $scope.markTable = function (i) {
             var t = $('#table' + i);
