@@ -1,4 +1,4 @@
-var shopApp = angular.module('restaurantApp', ['ngRoute', 'appControllers', 'appFilters', 'appDirectives','ui.bootstrap',
+var shopApp = angular.module('restaurantApp', ['ngAnimate', 'ngRoute', 'appControllers', 'appFilters', 'appDirectives','ui.bootstrap',
     'appServices']);
 
 shopApp.config(['$routeProvider', function ($routeProvider) {

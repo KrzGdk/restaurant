@@ -85,32 +85,31 @@ div#top, h1#menu, h1#book {
     color: #b46e30;
 }
 
-.tableSvg {
+.table-svg {
 
 }
 
-.tableSvg:hover {
+.table-svg:hover {
     fill: #b46e30;
     cursor: pointer;
 }
 
-.tableSvg-selected {
+.table-svg-selected {
     fill: #5cb85c;
 }
 
-.tableSvg-selected:hover {
+.table-svg-selected:hover {
     fill: #5cb85c;
 }
 
-.tableSvg-reserved {
+.table-svg-disabled {
     fill: #656565;
 }
 
-.tableSvg-reserved:hover {
+.table-svg-disabled:hover {
     fill: #656565;
     cursor: default;
 }
-
 
 .glyphicon-star, .glyphicon-star-empty {
     color: #97922a;
@@ -124,7 +123,7 @@ div#top, h1#menu, h1#book {
     height: 30px;
 }
 
-.tableSvg text {
+.table-svg text {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -141,4 +140,8 @@ div#top, h1#menu, h1#book {
 input[type=date]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     display: none;
+}
+
+.tooltip-inner {
+    width: 400px;
 }

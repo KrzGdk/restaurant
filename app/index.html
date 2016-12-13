@@ -137,103 +137,98 @@
 <div class="container-fluid main">
   <div class="row" style="margin-bottom: 20px;margin-top: 10px">
     <h1 class="text-center" id="book">Zarezerwuj stolik</h1>
-    <div class="col-lg-offset-1 col-lg-5 col-md-6 col-sm-6">
-      <div class="form-horizontal">
-        <div class="form-group">
-          <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationDate">Data rezerwacji</label>
-          <div class="col-lg-6 col-md-6 col-sm-12">
-            <input class="form-control" type="date" id="reservationDate" ng-model="reservationDate"
-                   ng-disabled="reservedTables.length > 0"/>
+    <form ng-submit="true">
+      <div class="col-lg-offset-1 col-lg-5 col-md-6 col-sm-6">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationDate">Data rezerwacji</label>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+              <input class="form-control" type="date" id="reservationDate" ng-model="reservationDate"
+                     ng-disabled="reservedTables.length > 0" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationBeginTime">Przedział
+              czasowy: <span class="glyphicon glyphicon-info-sign" uib-popover="Wybierz przedział między 12:00 a 22:00" popover-trigger="'mouseenter'"></span> </label>
+            <div class="col-lg-3 col-md-3 col-sm-6">
+              <input class="form-control" type="time" id="reservationBeginTime" ng-model="reservationBeginTime"
+                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required/>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6" ng-class="{'has-error': reservationBeginTime >= reservationEndTime}">
+              <input class="form-control" type="time" id="reservationEndTime" ng-model="reservationEndTime"
+                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required/>
+            </div>
           </div>
         </div>
+        <figure>
+          <svg viewBox="0 0 100 60">
+            <g ng-repeat="i in [0,1,2,3,4,5,6,7,8]" id="table{{i+1}}" class="table-svg" ng-click="markTable(i+1)" ng-class="{'table-svg-disabled' : !reservationBeginTime || !reservationEndTime || reservationBeginTime >= reservationEndTime}">
+              <rect height="12" width="10" ng-attr-x="{{svg.marginLeft+30*(i%3)}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1)}}" rx="2"
+                    ry="2"></rect>
+              <text ng-attr-x="{{svg.marginLeft+2+30*(i%3)}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1)+8}}" fill="#FFFFFF"
+                    style="font-size:5px">
+                #{{i+1}}
+              </text>
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)-4}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 2}}"
+                    rx="1"
+                    ry="1"></rect>
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)-4}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 7}}"
+                    rx="1"
+                    ry="1"></rect>
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)+11}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 2}}"
+                    rx="1" ry="1"></rect>
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)+11}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 7}}"
+                    rx="1" ry="1"></rect>
+            </g>
+          </svg>
+        </figure>
       </div>
-      <figure>
-        <svg viewBox="0 0 100 60">
-          <g ng-repeat="i in [0,1,2]" id="table{{i+1}}" class="tableSvg" ng-click="markTable(i+1)">
-            <rect height="12" width="10" ng-attr-x="{{svg.marginLeft+30*i}}" ng-attr-y="{{svg.marginTopRow}}" rx="2"
-                  ry="2"></rect>
-            <text ng-attr-x="{{svg.marginLeft+2+30*i}}" ng-attr-y="{{svg.marginTopRow+12-4}}" fill="#FFFFFF"
-                  style="font-size:5px">
-              #{{i+1}}
-            </text>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i-4}}" ng-attr-y="{{svg.marginTopRow + 2}}" rx="1"
-                  ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i-4}}" ng-attr-y="{{svg.marginTopRow + 7}}" rx="1"
-                  ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i+11}}" ng-attr-y="{{svg.marginTopRow + 2}}"
-                  rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i+11}}" ng-attr-y="{{svg.marginTopRow + 7}}"
-                  rx="1" ry="1"></rect>
-          </g>
-          <g ng-repeat="i in [0,1,2]" id="table{{i+4}}" class="tableSvg" ng-click="markTable(i+4)">
-            <rect height="12" width="10" ng-attr-x="{{svg.marginLeft+30*i}}"
-                  ng-attr-y="{{svg.marginTopRow*2+svg.tableHeight}}" rx="2" ry="2"></rect>
-            <text ng-attr-x="{{svg.marginLeft+2+30*i}}" ng-attr-y="{{svg.marginTopRow*2+svg.tableHeight+8}}"
-                  fill="#FFFFFF" style="font-size:5px">
-              #{{i+4}}
-            </text>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i-4}}"
-                  ng-attr-y="{{svg.marginTopRow*2+svg.tableHeight+7}}" rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i-4}}"
-                  ng-attr-y="{{svg.marginTopRow*2+svg.tableHeight+2}}" rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i+11}}"
-                  ng-attr-y="{{svg.marginTopRow*2+svg.tableHeight+7}}" rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i+11}}"
-                  ng-attr-y="{{svg.marginTopRow*2+svg.tableHeight+2}}" rx="1" ry="1"></rect>
-          </g>
-          <g ng-repeat="i in [0,1,2]" id="table{{i+7}}" class="tableSvg" ng-click="markTable(i+7)">
-            <rect height="12" width="10" ng-attr-x="{{svg.marginLeft+30*i}}"
-                  ng-attr-y="{{svg.marginTopRow*3+svg.tableHeight*2}}" rx="2" ry="2"></rect>
-            <text ng-attr-x="{{svg.marginLeft+2+30*i}}" ng-attr-y="{{svg.marginTopRow*3+svg.tableHeight*2+8}}"
-                  fill="#FFFFFF" style="font-size:5px">
-              #{{i+7}}
-            </text>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i-4}}"
-                  ng-attr-y="{{svg.marginTopRow*3+svg.tableHeight*2+7}}" rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i-4}}"
-                  ng-attr-y="{{svg.marginTopRow*3+svg.tableHeight*2+2}}" rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i+11}}"
-                  ng-attr-y="{{svg.marginTopRow*3+svg.tableHeight*2+7}}" rx="1" ry="1"></rect>
-            <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*i+11}}"
-                  ng-attr-y="{{svg.marginTopRow*3+svg.tableHeight*2+2}}" rx="1" ry="1"></rect>
-          </g>
-        </svg>
-      </figure>
-    </div>
-    <div class="col-lg-5 col-md-6 col-sm-6">
-      <div class="vertical-center" ng-hide="reservedTables.length > 0">
-        <h4 style="color: #777777">Aby rozpocząć rezerwację, wybierz dzień i stolik</h4>
-      </div>
-      <div ng-hide="reservedTables.length == 0">
-        <h4 style="">Rezerwacja na dzień <strong>{{reservationDate | polishDate}}</strong>:</h4>
-        <div>Wybrane stoliki ({{reservedTables.length}}):
-          <div style="font-size: medium; margin-right: 5px;margin-bottom: 5px;display: inline-block" class="label label-success"
-               ng-repeat="reservedTable in reservedTables">#{{reservedTable}}<!--
+      <div class="col-lg-5 col-md-6 col-sm-6">
+        <div class="vertical-center" ng-hide="reservedTables.length > 0 && reservationBeginTime && reservationEndTime">
+          <h4 style="color: #777777">Aby rozpocząć rezerwację, wybierz datę i stolik</h4>
+        </div>
+        <div ng-hide="reservedTables.length == 0  || !reservationBeginTime || !reservationEndTime">
+          <h4 style="">Rezerwacja na dzień <strong>{{reservationDate | polishDate}}</strong>:</h4>
+          <div>Wybrane stoliki ({{reservedTables.length}}):
+            <div style="font-size: medium; margin-right: 5px;margin-bottom: 5px;display: inline-block"
+                 class="label label-success"
+                 ng-repeat="reservedTable in reservedTables">#{{reservedTable}}<!--
        --></div>
-        </div>
-        <div>
-          <h5>Rezerwuj menu:</h5>
-          <table class="table table-striped table-condensed">
-            <tr ng-repeat="dish in filteredReservingMenu" ng-class="{success: reservedDishes[dish._id]}">
-              <td class="col-lg-11 col-md-11" style="margin-top: 5px;">
-                <label for="{{dish._id}}-select" class="menu-reservation-label">&#8203;{{dish.name}}</label>
-              </td>
-              <td class="col-lg-1 col-md-1">
-                <div class="checkbox pull-right" style="margin-top: 5px;">
-                  <input type="checkbox" style="margin-top: 0;" value="" ng-hide="dish.name==''" ng-disabled="dish.name==''" id="{{dish._id}}-select" ng-model="reservedDishes[dish._id]">
-                </div>
-              </td>
-            </tr>
-          </table>
-          <div class="text-center col-lg-12">
-            <ul uib-pagination items-per-page="reservingItemsPerPage" total-items="totalItems" ng-model="reservingCurrentPage"
-                ng-change="pageChangedReserving()" previous-text="&lsaquo;" next-text="&rsaquo;" max-size="5"
-                force-ellipses="true" boundary-links="true" first-text="&laquo;" last-text="&raquo;"
-                style="margin-top: -10px;"></ul>
+          </div>
+          <div>
+            <h5>Rezerwuj menu: (opcjonalne)</h5>
+            <table class="table table-striped table-condensed">
+              <tr ng-repeat="dish in filteredReservingMenu" ng-class="{success: reservedDishes[dish._id]}">
+                <td class="col-lg-11 col-md-11" style="margin-top: 5px;">
+                  <label for="{{dish._id}}-select" class="menu-reservation-label">&#8203;{{dish.name}}</label>
+                </td>
+                <td class="col-lg-1 col-md-1">
+                  <div class="checkbox pull-right" style="margin-top: 5px;">
+                    <input type="checkbox" style="margin-top: 0;" value="" ng-hide="dish.name==''"
+                           ng-disabled="dish.name==''" id="{{dish._id}}-select" ng-model="reservedDishes[dish._id]">
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <div class="text-center col-lg-12">
+              <ul uib-pagination items-per-page="reservingItemsPerPage" total-items="totalItems"
+                  ng-model="reservingCurrentPage"
+                  ng-change="pageChangedReserving()" previous-text="&lsaquo;" next-text="&rsaquo;" max-size="5"
+                  force-ellipses="true" boundary-links="true" first-text="&laquo;" last-text="&raquo;"
+                  style="margin-top: -10px;"></ul>
+            </div>
+          </div>
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label><input type="checkbox" name="checkbox" value="value"> Akceptuję regulamin</label>
+            </div>
+            <div class="checkbox">
+              <input type="submit" class="btn btn-primary" value="Rezerwuj"/>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 <div class="container-fluid main">
@@ -251,17 +246,17 @@
 <script type="text/javascript">
   var today = new Date();
   var dd = today.getDate();
-  var mm = today.getMonth()+1;
+  var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
-  if(dd<10){
-    dd='0'+dd
+  if (dd < 10) {
+    dd = '0' + dd
   }
-  if(mm<10){
-    mm='0'+mm
+  if (mm < 10) {
+    mm = '0' + mm
   }
 
-  today = yyyy+'-'+mm+'-'+dd;
-  document.getElementById("reservationDate").setAttribute("min", today);
+  var todayString = yyyy + '-' + mm + '-' + dd;
+  document.getElementById("reservationDate").setAttribute("min", todayString);
 
 
   var jumboHeight = $('.jumbotron').outerHeight();

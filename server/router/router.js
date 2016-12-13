@@ -12,6 +12,13 @@ module.exports = function (websocket) {
         res.send('Hello World!')
     });
 
+    router.get('/dish-details', function (req, res) { // TODO dish-detail by dishId
+        models.Dish.find(function (err, db) {
+            if (err) throw err;
+            res.send(db);
+        })
+    });
+
     router.get('/dish', function (req, res) {
         models.Dish.find(function (err, db) {
             if (err) throw err;

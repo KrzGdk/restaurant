@@ -21,6 +21,6 @@ angular.module('appFilters', [])
                 'listopada',
                 'grudnia'
             ];
-            return date.getDate() + " " + monthNames[date.getMonth() - 1] + " " + date.getFullYear();
+            return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
         };
     });

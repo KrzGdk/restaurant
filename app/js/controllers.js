@@ -1,7 +1,7 @@
 var appControllers = angular.module('appControllers', []);
 
 appControllers.controller('MainCtrl',
-    function ($scope, $routeParams, $http, $filter, Menu, $uibModal) {
+    function ($scope, $routeParams, $http, $filter, Menu, $uibModal, $uibTooltip) {
         $scope.menu = Menu.query([], function () {
             $scope.pageChanged();
             $scope.pageChangedReserving();
@@ -44,23 +44,26 @@ appControllers.controller('MainCtrl',
             marginTopRow: 5,
             marginBottomRow: 5
         };
+        $scope.floor = Math.floor;
 
         $scope.reservationDate = new Date();
+        $scope.reservationBeginTime = null;
+        $scope.reservationEndTime = null;
         $scope.reservedTables = [];
         $scope.reservedDishes = {};
 
         $scope.markTable = function (i) {
             var t = $('#table' + i);
-            if (!t.hasClass('tableSvg-reserved')) {
+            if (!t.hasClass('table-svg-disabled')) {
                 if ($scope.reservedTables.indexOf(i) == -1) {
                     $scope.reservedTables.push(i);
                     $scope.reservedTables.sort();
-                    t.addClass('tableSvg-selected');
+                    t.addClass('table-svg-selected');
                 }
                 else {
                     var index = $scope.reservedTables.indexOf(i)
                     $scope.reservedTables.splice(index, 1);
-                    t.removeClass('tableSvg-selected');
+                    t.removeClass('table-svg-selected');
                 }
             }
         };
