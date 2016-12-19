@@ -11,7 +11,7 @@
         crossorigin="anonymous">
   <link rel="stylesheet" href="css/app.css" type="text/css">
 
-  <script type="text/javascript" src="js/lib/jquery-3.1.1.js"></script>
+  <script type="text/javascript" src="js/lib/jquery-2.2.4.min.js"></script>
   <script type="text/javascript" src="js/lib/jquery-ui.js"></script>
   <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/lib/angular.js"></script>
@@ -137,7 +137,7 @@
 <div class="container-fluid main">
   <div class="row" style="margin-bottom: 20px;margin-top: 10px">
     <h1 class="text-center" id="book">Zarezerwuj stolik</h1>
-    <form ng-submit="true">
+    <form ng-submit="addReservation()">
       <div class="col-lg-offset-1 col-lg-5 col-md-6 col-sm-6">
         <div class="form-horizontal">
           <div class="form-group">
@@ -149,39 +149,51 @@
           </div>
           <div class="form-group">
             <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationBeginTime">Przedział
-              czasowy: <span class="glyphicon glyphicon-info-sign" uib-popover="Wybierz przedział między 12:00 a 22:00" popover-trigger="'mouseenter'"></span> </label>
+              czasowy: <span class="glyphicon glyphicon-info-sign" uib-popover="Wybierz przedział między 12:00 a 22:00"
+                             popover-trigger="'mouseenter'"></span> </label>
             <div class="col-lg-3 col-md-3 col-sm-6">
               <input class="form-control" type="time" id="reservationBeginTime" ng-model="reservationBeginTime"
-                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required/>
+                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required ng-change="loadTables()"/>
             </div>
-            <div class="col-lg-3 col-md-3 col-sm-6" ng-class="{'has-error': reservationBeginTime >= reservationEndTime}">
+            <div class="col-lg-3 col-md-3 col-sm-6"
+                 ng-class="{'has-error': reservationBeginTime >= reservationEndTime}">
               <input class="form-control" type="time" id="reservationEndTime" ng-model="reservationEndTime"
-                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required/>
+                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required ng-change="loadTables()"/>
+            </div>
+            <div class="col-lg-1" ng-show="isLoadingTables" style="padding-top: 8px;">
+              <span class="glyphicon glyphicon-repeat fast-right-spinner"></span>
             </div>
           </div>
         </div>
         <figure>
           <svg viewBox="0 0 100 60">
-            <g ng-repeat="i in [0,1,2,3,4,5,6,7,8]" id="table{{i+1}}" class="table-svg" ng-click="markTable(i+1)" ng-class="{'table-svg-disabled' : !reservationBeginTime || !reservationEndTime || reservationBeginTime >= reservationEndTime}">
-              <rect height="12" width="10" ng-attr-x="{{svg.marginLeft+30*(i%3)}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1)}}" rx="2"
+            <g ng-repeat="i in [0,1,2,3,4,5,6,7,8]" id="table{{i+1}}" class="table-svg" ng-click="markTable(i+1)"
+               ng-class="{'table-svg-disabled' : !reservationBeginTime || !reservationEndTime || reservationBeginTime >= reservationEndTime || isLoadingTables || takenTables[i+1] }"
+               ng-mouseover="showAvailability(i+1)" ng-mouseleave="clearAvailability()">
+              <rect height="12" width="10" ng-attr-x="{{svg.marginLeft+30*(i%3)}}"
+                    ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1)}}" rx="2"
                     ry="2"></rect>
-              <text ng-attr-x="{{svg.marginLeft+2+30*(i%3)}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1)+8}}" fill="#FFFFFF"
-                    style="font-size:5px">
-                #{{i+1}}
+              <text ng-attr-x="{{svg.marginLeft+2+30*(i%3)}}"
+                    ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1)+8}}"
+                    fill="#FFFFFF" style="font-size:5px"> #{{i+1}}
               </text>
-              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)-4}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 2}}"
-                    rx="1"
-                    ry="1"></rect>
-              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)-4}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 7}}"
-                    rx="1"
-                    ry="1"></rect>
-              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)+11}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 2}}"
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)-4}}"
+                    ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 2}}"
                     rx="1" ry="1"></rect>
-              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)+11}}" ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 7}}"
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)-4}}"
+                    ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 7}}"
+                    rx="1" ry="1"></rect>
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)+11}}"
+                    ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 2}}"
+                    rx="1" ry="1"></rect>
+              <rect height="3" width="3" ng-attr-x="{{svg.marginLeft+30*(i%3)+11}}"
+                    ng-attr-y="{{svg.marginTopRow*floor((i+3)/3) + svg.tableHeight*(floor((i+3)/3)-1) + 7}}"
                     rx="1" ry="1"></rect>
             </g>
           </svg>
         </figure>
+        <div id="table-availability" class="col-lg-11 col-md-11" style="border: 1px solid #333;border-radius: 5px;display: none;">
+        </div>
       </div>
       <div class="col-lg-5 col-md-6 col-sm-6">
         <div class="vertical-center" ng-hide="reservedTables.length > 0 && reservationBeginTime && reservationEndTime">
@@ -220,9 +232,21 @@
           </div>
           <div class="form-horizontal">
             <div class="form-group">
-              <label><input type="checkbox" name="checkbox" value="value"> Akceptuję regulamin</label>
+              <label><input type="checkbox" name="checkbox" value="value" required> Akceptuję regulamin</label>
             </div>
-            <div class="checkbox">
+            <div class="form-group">
+              <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationEmail">E-mail:</label>
+              <div class="col-lg-6 col-md-6 col-sm-6">
+                <input class="form-control" type="email" id="reservationEmail" ng-model="reservationEmail"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationEmail">Telefon:</label>
+              <div class="col-lg-6 col-md-6 col-sm-6">
+                <input class="form-control" type="text" id="reservationPhone" ng-model="reservationPhone"/>
+              </div>
+            </div>
+            <div class="form-group">
               <input type="submit" class="btn btn-primary" value="Rezerwuj"/>
             </div>
           </div>
@@ -297,6 +321,7 @@
 
   });
 </script>
+<script type="text/javascript" src="js/tooltip.js"></script>
 </body>
 
 </html>

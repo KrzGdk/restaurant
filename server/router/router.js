@@ -12,6 +12,30 @@ module.exports = function (websocket) {
         res.send('Hello World!')
     });
 
+    router.get('/reservations', function (req, res) {
+        models.Reservation.find(function (err, db) {
+            if (err) throw err;
+            res.send(db);
+        });
+    });
+
+    router.post('/reservations', function (req, res) {
+        var r = new models.Reservation();
+        r.date = req.body.date;
+        r.beginTime = req.body.beginTime;
+        r.endTime = req.body.endTime;
+        r.tables = req.body.tables;
+        r.menu = req.body.menu;
+        r.email = req.body.email;
+        r.phone = req.body.phone;
+        r.save(function (err, r) {
+            if (err) res.sendStatus(500);
+            else {
+                res.sendStatus(200);
+            }
+        });
+    });
+
     router.get('/dish-details', function (req, res) { // TODO dish-detail by dishId
         models.Dish.find(function (err, db) {
             if (err) throw err;

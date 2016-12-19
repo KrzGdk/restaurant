@@ -1,7 +1,7 @@
 var appControllers = angular.module('appControllers', []);
 
 appControllers.controller('MainCtrl',
-    function ($scope, $routeParams, $http, $filter, Menu, $uibModal, $uibTooltip) {
+    function ($scope, $routeParams, $http, $filter, Menu, $uibModal, $uibTooltip, Reservations) {
         $scope.menu = Menu.query([], function () {
             $scope.pageChanged();
             $scope.pageChangedReserving();
@@ -32,7 +32,7 @@ appControllers.controller('MainCtrl',
             $scope.filteredReservingMenu = $scope.menu.slice(begin, end);
             var mod = $scope.filteredReservingMenu.length % $scope.reservingItemsPerPage;
             while (mod != 0) {
-                $scope.filteredReservingMenu.push({name:""});
+                $scope.filteredReservingMenu.push({name: ""});
                 mod = $scope.filteredReservingMenu.length % $scope.reservingItemsPerPage;
             }
         };
@@ -51,6 +51,86 @@ appControllers.controller('MainCtrl',
         $scope.reservationEndTime = null;
         $scope.reservedTables = [];
         $scope.reservedDishes = {};
+        $scope.reservationEmail = "";
+        $scope.reservationPhone = "";
+        $scope.isLoadingTables = false;
+        $scope.takenTables = {};
+        $scope.loadTables = function () {
+            if ($scope.reservationBeginTime != null && $scope.reservationEndTime != null &&
+                $scope.reservationBeginTime < $scope.reservationEndTime) {
+                $scope.isLoadingTables = true;
+                Reservations.getReservations($scope.reservationDate, $scope.reservationBeginTime, $scope.reservationEndTime)
+                    .then(function success(reservations) {
+                        parseReservations(reservations.data);
+                        $scope.isLoadingTables = false;
+                    });
+            }
+        };
+        var parseReservations = function (reservations) {
+            var disabledTablesArrays = reservations.map(function (r) {
+                return r.tables;
+            });
+            [].concat.apply([], disabledTablesArrays)
+                .filter(function (e, i, arr) {
+                    return arr.lastIndexOf(e) === i;
+                })
+                .forEach(function (tableId) {
+                    for (var i = 0; i < reservations.length; i++) {
+                        if (reservations[i].tables.indexOf(tableId) != -1) {
+                            if (tableId in $scope.takenTables) {
+                                $scope.takenTables[tableId].push({
+                                    from: reservations[i].beginTime,
+                                    to: reservations[i].endTime
+                                });
+                            }
+                            else {
+                                $scope.takenTables[tableId] = [{
+                                    from: reservations[i].beginTime,
+                                    to: reservations[i].endTime
+                                }];
+                            }
+                        }
+                    }
+                });
+        };
+
+        $scope.showAvailability = function (i) {
+            if ($scope.takenTables[i]) {
+                document.getElementById('table-availability').innerHTML =
+                    "Stolik #" + i + " zajęty w godzinach: " +
+                    $scope.takenTables[i].map(function (timeRange) {
+                        return formatTimeRange(new Date(timeRange.from)) + '-' + formatTimeRange(new Date(timeRange.to))
+                    }).join(", ");
+                $('#table-availability').css('display', 'block');
+            }
+        };
+        $scope.clearAvailability = function () {
+            document.getElementById('table-availability').innerHTML = "&#8203;";
+        };
+
+        var formatTimeRange = function (tr) {
+            return pad(tr.getHours()) + ":" + pad(tr.getMinutes());
+        };
+
+        function pad(n) {
+            return n < 10 ? '0' + n.toString(10) : n.toString(10);
+        }
+
+        $scope.addReservation = function () {
+            Reservations.addReservation({
+                date: $scope.reservationDate,
+                beginTime: $scope.reservationBeginTime,
+                endTime: $scope.reservationEndTime,
+                tables: $scope.reservedTables,
+                menu: $scope.menu.filter(function (d) {
+                    return d._id in $scope.reservedDishes;
+                }),
+                email: $scope.reservationEmail,
+                phone: $scope.reservationPhone
+            }).then(function success() {
+                $scope.loadTables();
+            });
+        };
 
         $scope.markTable = function (i) {
             var t = $('#table' + i);
