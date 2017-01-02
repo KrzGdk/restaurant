@@ -1,5 +1,5 @@
 angular.module("shopAdminApp")
-    .constant("authUrl", "http://localhost:2403/users/login")
+    .constant("authUrl", "http://localhost:3000/login")
     .controller("AuthCtrl", function ($scope, $http, $location, authUrl) {
 
         $scope.login = function () {
@@ -19,142 +19,93 @@ angular.module("shopAdminApp")
             });
         }
     })
-    .controller("OrdersCtrl", function ($scope, $http, $location, authUrl, Orders) {
-        $scope.orders = Orders.query([]);
-        $scope.details = {};
-        $scope.orders.forEach(function (o) {
-            $scope.details[o.id] = false;
+    .controller("ReservationsCtrl", function ($scope, $http, $location, authUrl, Reservations) {
+        Reservations.getReservations(new Date()).then(function (result) {
+            $scope.reservations = result.data;
         });
+        $scope.reservationDate = new Date();
+        $scope.reloadReservations = function () {
+            Reservations.getReservations($scope.reservationDate, $scope.reservationBeginTime, $scope.reservationEndTime).then(function (result) {
+                $scope.reservations = result.data;
+            });
+        }
 
-        $scope.toggleShowDetails = function (order) {
-            $scope.details[order.id] = !$scope.details[order.id];
-        };
-
-        $scope.showDetails = function (order) {
-            return $scope.details[order.id];
-        };
-
-        $scope.productSum =  function(items) {
-            return items
-                .map(function (prod) {
-                    return prod.price * prod.quantity;
-                })
-                .reduce(function (price1, price2) {
-                return price1 + price2;
-            }, 0);
-        };
     })
-    .controller("ProductsCtrl", function ($scope, $http, $location, authUrl, Products) {
+    .controller("DishCtrl", function ($scope, $http, $location, $routeParams, Dish, Categories) {
+        Categories.getCategories().then(function (result) {
+            $scope.categories = result.data.map(function (c) {
+                return c.name;
+            });
+        });
+        if ($routeParams.dishId) {
+            $scope.dishId = $routeParams.dishId;
+            Dish.getWithDetails($scope.dishId).then(function (res) {
+                $scope.dish = res.data.dish;
+                $scope.dishName = res.data.dish.name;
+                $scope.details = res.data.details;
+            });
+        } else {
+            $scope.dishName = false;
+            $scope.dish = {
+                name: "",
+                active: true,
+                category: "Dania główne"
+            };
+            $scope.details = {
+                description: "",
+                ingredients: []
+            }
+        }
+
+        $scope.addIngredient = function () {
+            $scope.details.ingredients.push("");
+        };
+
+        $scope.removeIngredient = function (i) {
+            $scope.details.ingredients.splice(i, 1);
+        };
+
+        $scope.saveDish = function () {
+            var ingredientElements = $(".dishIngredients");
+            $scope.details.ingredients = ingredientElements.map(function (index, ingredientElement) {
+                return ingredientElement.value;
+            }).get();
+            if ($scope.dishId) {
+                Dish.editWithDetails($scope.dishId, $scope.dish, $scope.details, document.getElementById("exampleInputFile").files[0]).then(function () {
+                    $location.path("menu");
+                });
+            } else {
+                Dish.addWithDetails($scope.dish, $scope.details, document.getElementById("exampleInputFile").files[0]).then(function () {
+                    $location.path("menu");
+                });
+            }
+
+        }
+
+    })
+    .controller("MenuCtrl", function ($scope, $http, $location, authUrl, Menu, Categories, Dish) {
         $scope.alerts = [];
-        $scope.addProductName = "";
-        $scope.addProductPrice = "";
-        $scope.addProductCategory = "";
-        $scope.products = Products.query([]);
-        $scope.selectableCategories = [
-            "Pieczywo",
-            "Napoje",
-            "Nabiał",
-            "Słodycze",
-            "Alkohole"
-        ];
-
-        $scope.edit = function (product) {
-            Products.update({id: product.id}, product, function () {
-                $scope.alerts.push({
-                    type: 'success', msg: 'Zaktualizowano pozycję.'
-                });
-                $scope.products = Products.query([]);
-            }, function (resp) {
-                if (resp.status == 401) {
-                    $location.path('/login').replace();
-                }
-                else if (resp.status == 400) {
-                    var fieldsString = Object.keys(resp.data.errors)
-                        .map(function (field) {
-                            switch (field) {
-                                case "name":
-                                    return "Nazwa";
-                                    break;
-                                case "price":
-                                    return "Cena";
-                                    break;
-                                case "category":
-                                    return "Kategoria";
-                                    break;
-                            }
-                        })
-                        .join(", ");
-                    $scope.alerts.push({
-                        type: 'danger', msg: 'Błąd dodawania pozycji. Wypełnij prawidłowo pola: ' + fieldsString
-                    });
-                }
-                else {
-                    $scope.alerts.push({
-                        type: 'danger', msg: 'Błąd dodawania pozycji.'
-                    });
-                }
+        Dish.getAll().then(function (result) {
+            $scope.menu = result.data;
+        });
+        Categories.getCategories().then(function (result) {
+            $scope.selectableCategories = result.data.map(function (c) {
+                return c.name;
             });
+            $scope.selectableCategories.splice(0, 0, "Wszystkie kategorie");
+        });
+        $scope.nameFilterField = "";
+        $scope.selectedCategory = {category: "Wszystkie kategorie"};
+
+        $scope.deactivate = function (dish) {
+            Dish.deactivate(dish._id).then(function () {
+                dish.active = false;
+            })
         };
-
-        $scope.add = function () {
-            Products.save({
-                name: $scope.addProductName,
-                price: $scope.addProductPrice,
-                category: $scope.addProductCategory,
-            }, function () {
-                $scope.alerts.push({
-                    type: 'success', msg: 'Dodano pozycję.'
-                });
-                $scope.products = Products.query([]);
-                $scope.addProductName = "";
-                $scope.addProductPrice = "";
-                $scope.addProductCategory = "";
-            }, function (resp) {
-                if (resp.status == 401) {
-                    $location.path('/login').replace();
-                }
-                else if (resp.status == 400) {
-                    var fieldsString = Object.keys(resp.data.errors)
-                        .map(function (field) {
-                            switch (field) {
-                                case "name":
-                                    return "Nazwa";
-                                    break;
-                                case "price":
-                                    return "Cena";
-                                    break;
-                                case "category":
-                                    return "Kategoria";
-                                    break;
-                            }
-                        })
-                        .join(", ");
-                    $scope.alerts.push({
-                        type: 'danger', msg: 'Błąd dodawania pozycji. Wypełnij prawidłowo pola: ' + fieldsString
-                    });
-                }
-                else {
-                    $scope.alerts.push({
-                        type: 'danger', msg: 'Błąd dodawania pozycji.'
-                    });
-                }
-            });
-        };
-
-        $scope.delete = function (product) {
-            Products.delete({id: product.id}, function () {
-                $scope.alerts.push({
-                    type: 'success', msg: 'Usunięto pozycję.'
-                });
-                $scope.products = Products.query([]);
-            }, function (resp) {
-                if (resp.status == 401) {
-                    $location.path('/login').replace();
-                }
-                $scope.alerts.push({
-                    type: 'danger', msg: 'Błąd usuwania pozycji.'
-                });
-            });
+        $scope.activate = function (dish) {
+            Dish.activate(dish._id).then(function () {
+                dish.active = true;
+            })
         };
 
         $scope.closeAlert = function (index) {

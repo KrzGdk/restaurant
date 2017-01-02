@@ -10,20 +10,21 @@ var prepareDateWithTime = function (time) {
 
 var prepareDateQuery = function (dateString) {
     var dateFrom = new Date(dateString.split("-")[2], dateString.split("-")[1], dateString.split("-")[0]);
-    var dateTo = new Date(dateString.split("-")[2], dateString.split("-")[1], dateString.split("-")[0] + 1);
+    var dateTo = new Date(dateString.split("-")[2], dateString.split("-")[1], parseInt(dateString.split("-")[0]) + 1);
     return {$gte: dateFrom, $lt: dateTo};
 };
 
 var findReservations = function (queryParams, callback) {
     var beginTime = prepareDateWithTime(queryParams.beginTime);
     var endTime = prepareDateWithTime(queryParams.endTime);
-    models.Reservation.find({
+    var selector = {
         $and: [
             {date: prepareDateQuery(queryParams.date)},
             {endTime: {$gte: beginTime}},
             {beginTime: {$lte: endTime}}
         ]
-    }).exec(callback);
+    };
+    models.Reservation.find(selector).exec(callback);
 };
 
 module.exports = {

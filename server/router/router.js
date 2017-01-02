@@ -1,4 +1,4 @@
-module.exports = function (websocket) {
+module.exports = function (websocket, upload) {
 
     var express = require('express');
     var router = express.Router();
@@ -8,6 +8,24 @@ module.exports = function (websocket) {
     var models = require('../model/init');
     var reservations = require('../service/reservations');
     // router.use(require("../auth/auth"));  TODO turn on on deploy
+    router.post('/login', function (req, res) {
+        if (req.session.user) {
+            res.sendStatus(200);
+            return;
+        }
+        models.User.findOne({'username': req.body.username}, function (err, user) {
+            if (user) {
+                req.session.user = user;
+                res.sendStatus(200);
+            }
+            else res.sendStatus(401);
+        });
+    });
+
+    router.post('/logout', function (req, res) {
+        req.session.user = null;
+        res.sendStatus(200);
+    });
 
     router.get('/', function (req, res) {
         res.send('Hello World!')
@@ -73,6 +91,141 @@ module.exports = function (websocket) {
         })
     });
 
+    router.get('/dish-all', function (req, res) {
+        models.Dish.find({}, function (err, db) {
+            if (err) throw err;
+            res.send(db);
+        })
+    });
+
+    router.get('/dish-w-details', function (req, res) {
+        models.Dish.findOne({
+            _id: req.query.id
+        }, function (err, dish) {
+            if (err) throw err;
+            models.Details.findOne({
+                dishId: req.query.id
+            }, function (err, details) {
+                if (err) throw err;
+                res.send({
+                    dish: dish,
+                    details: details
+                });
+            });
+        })
+    });
+
+    router.post('/dish-w-details/:id', upload.single("file"), function (req, res) {
+        function updateDish(dish, thumbnailPath) {
+            dish.name = req.body.name;
+            dish.active = req.body.active;
+            dish.category = req.body.category;
+            if (thumbnailPath) {
+                dish.thumbnail = thumbnailPath;
+            }
+            dish.save(function () {
+                models.Details.findOne({
+                    dishId: req.params.id
+                }, function (err, details) {
+                    if (err) throw err;
+                    details.description = req.body.description;
+                    details.ingredients = req.body.ingredients.split(",").filter(function (i) {
+                        return i != "";
+                    });
+                    details.save(function () {
+                        res.send({
+                            dish: dish,
+                            details: details
+                        });
+                    });
+                })
+            });
+        }
+
+        models.Dish.findOne({
+            _id: req.params.id
+        }, function (err, dish) {
+            if (err) throw err;
+
+            if (req.file) {
+                var tmpPath = req.file.path;
+
+                var src = fs.createReadStream(tmpPath);
+                var thumbnailPath = tmpPath + "." + req.file.originalname.split('.').pop();
+                var dest = fs.createWriteStream("app\\img\\menu\\thumbnails\\" + thumbnailPath);
+                src.pipe(dest);
+                src.on('end', function () {
+                    updateDish(dish, thumbnailPath);
+                });
+            }
+            else {
+                updateDish(dish);
+            }
+        })
+    });
+
+    router.post('/dish-w-details', upload.single("file"), function (req, res) {
+        var tmpPath = req.file.path;
+
+        var src = fs.createReadStream(tmpPath);
+        var thumbnailPath = tmpPath + "." + req.file.originalname.split('.').pop();
+        var dest = fs.createWriteStream("app\\img\\menu\\thumbnails\\" + thumbnailPath);
+        src.pipe(dest);
+        src.on('end', function () {
+            fs.unlink(tmpPath);
+            var dish = new models.Dish();
+            dish.name = req.body.name;
+            dish.thumbnail = thumbnailPath;
+            dish.category = req.body.category;
+            dish.active = true;
+            console.log(dish);
+            dish.save(function (err, dish) {
+                if (err) console.error(err);
+                else {
+                    console.log(dish);
+                    var details = new models.Details();
+                    details.dishId = dish._id;
+                    details.description = req.body.description;
+                    details.ingredients = req.body.ingredients.split(",").filter(function (i) {
+                        return i != "";
+                    });
+                    details.save(function (err, p) {
+                        if (err) console.error(err);
+                        else console.log(p);
+                        res.sendStatus(200);
+                    });
+                }
+            });
+        });
+
+    });
+
+    router.post('/dish/:id/deactivate', function (req, res) {
+        models.Dish.findOne({
+            _id: req.params.id
+        }, function (err, d) {
+            if (err) throw err;
+            d.active = false;
+            d.save(function (err, d2) {
+                if (err) throw err;
+                res.send(d2);
+            });
+        })
+    });
+
+    router.post('/dish/:id/activate', function (req, res) {
+        models.Dish.findOne({
+            _id: req.params.id
+        }, function (err, d) {
+            if (err) throw err;
+            d.active = true;
+            d.save(function (err, d2) {
+                if (err) throw err;
+                res.send(d2);
+            });
+        })
+    });
+
     router.get('/details', function (req, res) {
         if (!req.query.d) {
             res.status(400).send("No id supplied");
@@ -85,7 +238,7 @@ module.exports = function (websocket) {
             res.send(db);
         })
     });
-    
+
     router.get('/comments', function (req, res) {
         if (!req.query.d) {
             res.status(400).send("No id supplied");
@@ -114,6 +267,7 @@ module.exports = function (websocket) {
             if (err) res.sendStatus(500);
             else {
                 res.sendStatus(200);
+                websocket.emit('comment.new', c);
             }
         });
     });
@@ -171,6 +325,17 @@ module.exports = function (websocket) {
         res.sendStatus(200);
     });
 
+    router.get('/initUser', function (req, res) {
+        var model = new models.User();
+        model.username = "admin";
+        model.password = "secret";
+        model.save(function (err, p) {
+            if (err) console.error(err);
+            else console.log(p);
+        });
+        res.sendStatus(200);
+    });
+
     router.post('/reset', function (req, res) {
         function removeAll(model) {
             var hasError = false;
@@ -179,6 +344,7 @@ module.exports = function (websocket) {
             });
             return hasError;
         }
+
         var hasErrors = [removeAll(models.Reservation), removeAll(models.Category),
             removeAll(models.Details), removeAll(models.Dish)];
         if (hasErrors.indexOf(true) != -1) {

@@ -9,14 +9,15 @@
   "author": "krzgdk",
   "license": "ISC",
   "dependencies": {
-    "connect": "^3.5.0",
-    "cors": "^2.8.1",
     "body-parser": "^1.15.2",
+    "connect": "^3.5.0",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.1",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "mongodb": "^2.2.11",
     "mongoose": "^4.7.0",
+    "multer": "^1.2.1",
     "serve-static": "^1.11.1",
     "socket.io": "^1.7.1"
   }

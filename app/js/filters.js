@@ -7,6 +7,12 @@ angular.module('appFilters', [])
     })
     .filter('polishDate', function () {
         return function (date) {
+            var dateObj;
+            if (typeof date === "string" ) {
+                dateObj = new Date(date);
+            } else {
+                dateObj = date;
+            }
             var monthNames = [
                 'stycznia',
                 'lutego',
@@ -21,11 +27,17 @@ angular.module('appFilters', [])
                 'listopada',
                 'grudnia'
             ];
-            return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear();
+            return dateObj.getDate() + " " + monthNames[dateObj.getMonth()] + " " + dateObj.getFullYear();
         };
     })
     .filter('polishDateTime', function () {
         return function (date) {
+            var dateObj;
+            if (typeof date === "string" ) {
+                dateObj = new Date(date);
+            } else {
+                dateObj = date;
+            }
             var monthNames = [
                 'stycznia',
                 'lutego',
@@ -40,7 +52,7 @@ angular.module('appFilters', [])
                 'listopada',
                 'grudnia'
             ];
-            return date.getDate() + " " + monthNames[date.getMonth()] + " " + date.getFullYear() + ","
-                + date.getHours() + ":" + date.getMinutes();
+            return dateObj.getDate() + " " + monthNames[dateObj.getMonth()] + " " + dateObj.getFullYear() + ","
+                + dateObj.getHours() + ":" + dateObj.getMinutes();
         };
     });

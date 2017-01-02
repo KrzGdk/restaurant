@@ -1,18 +1,33 @@
-var shopApp = angular.module('shopAdminApp', ['ngRoute','ui.bootstrap','adminAppServices', 'ngCookies']);
+var app = angular.module('shopAdminApp', ['ngRoute','ui.bootstrap','adminAppServices', 'appServices', 'ngCookies', 'appFilters']);
 
-shopApp.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+app.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
     $routeProvider.
     when('/', { templateUrl: 'views/admin/login.html', controller: 'AuthCtrl' }).
     when('/main', { templateUrl: 'views/admin/main.html', controller: 'AuthCtrl' }).
-    when('/products', { templateUrl: 'views/admin/products.html', controller: 'ProductsCtrl' }).
-    when('/orders', { templateUrl: 'views/admin/orders.html', controller: 'OrdersCtrl' }).
+    when('/menu', { templateUrl: 'views/admin/menu.html', controller: 'MenuCtrl' }).
+    when('/dish/:dishId', { templateUrl: 'views/admin/dish.html', controller: 'DishCtrl' }).
+    when('/dish', { templateUrl: 'views/admin/dish.html', controller: 'DishCtrl' }).
+    when('/reservations', { templateUrl: 'views/admin/reservations.html', controller: 'ReservationsCtrl' }).
     otherwise({ redirectTo: '/' });
 
     $httpProvider.defaults.withCredentials = true;
 }]);
 
-shopApp.filter('reverse', function() {
+app.filter('reverse', function() {
     return function(items) {
         return items.slice().reverse();
     };
+});
+
+app.run(function($rootScope, $location, Auth) {
+    $rootScope.$on('$locationChangeStart', function(e, toState) {
+        var isLogin = /#\/$/.test(toState);
+        if(isLogin){
+            return;
+        }
+        if(!Auth.isLoggedIn) {
+            e.preventDefault();
+            $location.path('/');
+        }
+    });
 });

@@ -32,7 +32,7 @@ appControllers.controller('MainCtrl',
         $scope.filteredReservingMenu = $scope.menu.slice(0, $scope.reservingItemsPerPage);
         $scope.reservingCurrentPage = 1;
         $scope.totalItems = $scope.menu.length;
-        $scope.selectedCategory = {category: "Wszystkie kategorie"}
+        $scope.selectedCategory = {category: "Wszystkie kategorie"};
 
         $scope.pageChangedReserving = function paginate() {
             var begin = (($scope.reservingCurrentPage - 1) * $scope.reservingItemsPerPage), end = begin + $scope.reservingItemsPerPage;
@@ -208,6 +208,17 @@ appControllers.controller('MainCtrl',
     })
     .controller('DishModalCtrl', function ($scope, $uibModalInstance, dish, Details, Comments, $filter) {
 
+        var socket = io.connect('http://localhost:3000');
+        socket.on('comment.new', function (data) {
+            if (data.dishId == dish._id) {
+                $scope.$apply(function() {
+                    $scope.comments.push(data);
+                    $scope.pageChanged();
+                    calculateRating();
+                });
+            }
+        });
+
         $scope.dish = dish;
         $scope.details = {};
         $scope.commentName = "";
@@ -229,17 +240,21 @@ appControllers.controller('MainCtrl',
             $scope.paginatedComments = $filter("orderBy")($scope.comments, "timestamp", true).slice(begin, end);
         };
 
+        function calculateRating() {
+            $scope.rating = Math.round($scope.comments.map(function (c) {
+                        return c.rating;
+                    }).reduce(function (p, c) {
+                        return p + c;
+                    }, 0) / $scope.comments.length) || 3;
+        }
+
         var loadComments = function () {
             Comments.getComments(dish._id).then(function (result) {
                 $scope.comments = result.data;
                 for(var i = 0; i < $scope.comments.length; i++) {
                     $scope.comments[i].timestamp = new Date($scope.comments[i].timestamp);
                 }
-                $scope.rating = Math.round(result.data.map(function (c) {
-                        return c.rating;
-                    }).reduce(function (p, c) {
-                        return p + c;
-                    }, 0) / $scope.comments.length) || 3;
+                calculateRating(result);
                 $scope.pageChanged();
             });
         };
