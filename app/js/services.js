@@ -35,3 +35,44 @@ appServices.service('Reservations', function ($http, $httpParamSerializer) {
         })
     }
 });
+
+appServices.service('Details', function ($http, $httpParamSerializer) {
+    this.getDetails = function (dishId) {
+        var qp = $httpParamSerializer({
+            d: dishId
+        });
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:3000/details?' + qp
+        });
+    };
+});
+
+appServices.service('Comments', function ($http, $httpParamSerializer) {
+    this.getComments = function (dishId) {
+        var qp = $httpParamSerializer({
+            d: dishId
+        });
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:3000/comments?' + qp
+        });
+    };
+
+    this.addComment = function (comment) {
+        return $http({
+            method: 'POST',
+            url: "http://localhost:3000/comments",
+            data: comment
+        })
+    }
+});
+
+appServices.service('Categories', function ($http) {
+    this.getCategories = function () {
+        return $http({
+            method: 'GET',
+            url: 'http://localhost:3000/categories'
+        });
+    };
+});

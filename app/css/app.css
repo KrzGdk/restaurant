@@ -6,7 +6,9 @@
 }
 
 body {
-    position: relative; margin-top: 40px;
+    position: relative;
+    margin-top: 40px;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .notValid {
@@ -29,7 +31,7 @@ table {
 }
 
 .menu-bg {
-    background: url('../img/bg-menu.jpg') repeat center center;
+    background: url('../img/floor.jpg') repeat center center;
 
     top: 0;
     position: fixed;
@@ -56,10 +58,10 @@ table {
 }
 
 .main {
-    background: #FFFFFF;
+    background-color: rgb(254, 250, 252);
 }
 
-div#top, h1#menu, h1#book {
+div#top, h1#menu, h1#book, h1#mapSection, h1#contactSection {
     padding-top: 60px;
     margin-top: -40px;
 }
@@ -73,16 +75,16 @@ div#top, h1#menu, h1#book {
     z-index: 99999;
 }
 .pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
-    background-color: #d48d4b;
-    border-color: #c37334;
+    background-color: #bd8555;
+    border-color: #bc8455;
 }
 
 .pagination>li>a, .pagination>li>span {
-    color: #b46e30;
+    color: #583732;
 }
 
 .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover {
-    color: #b46e30;
+    color: #583732;
 }
 
 .table-svg {
@@ -164,4 +166,14 @@ input[type=date]::-webkit-inner-spin-button {
 
 .tooltip-inner {
     width: 400px;
+}
+
+.contact-glyph{
+    height:2em;
+    width:2em;
+    border-radius:50%;
+    border:3px solid #a86946;
+    font-size: 80px;
+    padding-top: 37px;
+    color: #35201d;
 }

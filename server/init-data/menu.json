@@ -1,30 +1,151 @@
 [
   {
     "name": "Ravioli z krabem",
-    "thumbnail": "ravioli.jpg"
+    "thumbnail": "ravioli.jpg",
+    "active": true,
+    "category": "Dania główne",
+    "details": {
+      "description": "Ravioli to nieduże pierożki, które najczęściej nadziewa się serem ricotta, szpinakiem, mięsem i warzywami. Nadzienie z kraba sprawi, że danie nabierze wyjątkowego charakteru i doskonale sprawdzi się na kolacje i wydarzenia, kiedy chcemy oczarować czymś subtelnym i wyjątkowym.",
+      "ingredients": [
+        "Świeże lub mrożone odnóża kraba 400g",
+        "Szalotka 2 szt.",
+        "Czosnek 1 ząbek",
+        "Koperek 6 gałązek",
+        "Cytryna ½ szt.",
+        "Serek mascarpone 2 łyżki",
+        "Białe wino 50 ml",
+        "Ostra papryczka do smaku",
+        "Estragon 2 gałązki",
+        "Masło 40g"
+      ]
+    }
   },
   {
     "name": "Grillowany stek z wołowiny z warzywami",
-    "thumbnail": "stek.jpg"
+    "thumbnail": "stek.jpg",
+    "active": true,
+    "category": "Dania główne",
+    "details": {
+      "description": "Miękkie i delikatne mięso z polędwicy wołowej, to jeden z najbardziej cenionych mięsnych rarytasów. Stek podawany jest w akompaniamencie świeżych warzyw.",
+      "ingredients": [
+        "4 steki (po 220 g) z sezonowanego rostbefu wołowego",
+        "Sól morska",
+        "Pieprz czarny",
+        "Oliwa Extra Virgin",
+        "2 czarne pomidory",
+        "4 młode marchewki",
+        "4 szalotki",
+        "2 mini cukinie",
+        "Zielone szparagi",
+        "4 mini kukurydze",
+        "2 szt. topinambura (słonecznik bulwiasty) / zblanszowane",
+        "1 batat / zblanszowany",
+        "1 ząbek czosnku",
+        "Świeży tymianek",
+        "Sól morska, pieprz czarny do smaku"
+      ]
+    }
   },
   {
     "name": "Pikantne krewetki z wanilią",
-    "thumbnail": "krewetki.jpg"
+    "thumbnail": "krewetki.jpg",
+    "active": true,
+    "category": "Dania główne",
+    "details": {
+      "description": "Krewetki bardzo pikantne z czosnkiem i świeżym imbirem, to idealny sposób, by podkręcić smak krewetek. Są pikantne i odświeżające.",
+      "ingredients": [
+        "0,5 kg krewetek 16/20 z głową",
+        "0,2 kg makaronu conchiglioni",
+        "0,15 kg pomidorków koktajlowych",
+        "3-4 małe czerwone papryczki chili",
+        "2 ząbki czosnku",
+        "Limonka",
+        "Sól, cukier",
+        "1 laska wanilii",
+        "2 ziarna kardamonu",
+        "1 laska kory cynamonu"
+      ]
+    }
   },
   {
     "name": "Makaron soba ze smażonymi małżami w stylu chilli basil",
-    "thumbnail": "soba.jpg"
+    "thumbnail": "soba.jpg",
+    "active": true,
+    "category": "Przystawki",
+    "details": {
+      "description": "Soba posiada ciekawy gryczany posmak i interesujący charakterystyczny brązowo – szary kolor, który powoduje, że danie prezentuje się bardzo atrakcyjnie wizualnie. Połączenie makaronu z małżami, imbirem i czosnkiem tworzy bardzo ciekawą kompozycję.",
+      "ingredients": [
+        "0,05 kg makaronu soba",
+        "0,1kg małż",
+        "1 ząbek obranego czosnku",
+        "½ łyżki pasty sambal",
+        "4 listki świeżej bazylii",
+        "1 szt. listka limonki",
+        "8 ziarenek zielonego pieprzu",
+        "0,02 l wina ryżowego",
+        "1 łyżka sosu ostrygowego"
+      ]
+    }
   },
   {
     "name": "Turbot z ciepłą sałatką z kopru włoskiego",
-    "thumbnail": "turbot.jpg"
+    "thumbnail": "turbot.jpg",
+    "active": true,
+    "category": "Dania główne",
+    "details": {
+      "description": "Delikatne biało mięso, wykwintne w smaku pod każdą postacią. Idealnie komponuje się z ciepłą sałatką z kopru włoskiego, sosem z pomarańczy, marakui oraz czarnuszką i miodem.",
+      "ingredients": [
+        "Filet z turbota bez skóry 600 g",
+        "Koper włoski 1 szt. 300g",
+        "Sok wyciśnięty ze świeżych pomarańczy 500 ml",
+        "Sos rybny 60 ml",
+        "Miód 80 g",
+        "Czarnuszka 5 g",
+        "Marakuja 1szt. 60g"
+      ]
+    }
   },
   {
     "name": "Imbirowa wołowina z musem z groszku",
-    "thumbnail": "wolowina.jpg"
+    "thumbnail": "wolowina.jpg",
+    "active": true,
+    "category": "Dania główne",
+    "details": {
+      "description": "Sycące i fantastycznie rozgrzewające danie . Jest pełne smaku, przyjemnie pikantne, z wyczuwalnym lekko słodkim aromatem zielonego groszku. Wołowina świetnie smakuje podana ze szparagami oraz sałatką z bok choy i kurek.",
+      "ingredients": [
+        "Wołowina 200 g",
+        "Groszek zielony 100 g",
+        "Wasabi 20 g",
+        "Masło 10 g",
+        "Imbir 10 g",
+        "Białe szparagi 100 g",
+        "Pasta chilli 20 g",
+        "Bok choy 50 g",
+        "Baby por 2 szt.",
+        "Baby marchewka 2 szt."
+      ]
+    }
   },
   {
     "name": "Mus z fasolki i ciecierzycy podany z warzywami oraz galaretką z curry",
-    "thumbnail": "mus.jpg"
+    "thumbnail": "mus.jpg",
+    "active": true,
+    "category": "Przystawki",
+    "details": {
+      "description": "Pyszny mus z fasolki i ciecierzycy, którego wyostrza pikantny bakłażan oraz dobrze doprawiona galaretka z curry. Danie w stylu azjatyckim idealne dla wegetarian.",
+      "ingredients": [
+        "Ciecierzyca 150 g",
+        "Groszek zielony 150 g",
+        "Olej sezamowy ¼ łyżeczki",
+        "Pasta curry żółta 1 łyżka",
+        "Bakłażan ¼ szt",
+        "Pasta curry czerwona 1 łyżka",
+        "Agar 3 g",
+        "Mleko kokosowe 200 ml",
+        "Sos rybny 1 łyżka",
+        "Oliwa z oliwek 2 łyżki",
+        "Cytryna ½ szt."
+      ]
+    }
   }
 ]

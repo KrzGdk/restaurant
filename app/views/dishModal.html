@@ -9,26 +9,13 @@
       <img ng-src="../app/img/menu/thumbnails/{{dish.thumbnail}}" class="pull-right"
            style="width: 50%;margin-left: 10px"/>
       <p style="text-align: justify">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus aliquam ipsum. In suscipit lacus non risus
-        sagittis, eget tempor leo varius. In blandit neque ac libero feugiat, eu tristique risus ullamcorper. Aenean
-        convallis mollis felis, id gravida sapien. Morbi placerat nisi in porttitor egestas. Donec semper at sapien non
-        sollicitudin. Nulla sollicitudin lectus risus, vel aliquam arcu tempus interdum. Ut porttitor a dui sed cursus.
+        {{details.description}}
       </p>
       <h3>
         Składniki:
       </h3>
       <ul>
-        <li>Curabitur id placerat tellus</li>
-        <li>Donec metus eros</li>
-        <li>ultrices nec turpis sit amet</li>
-        <li>viverra cursus augue</li>
-        <li>Curabitur pretium tincidunt ultrices</li>
-        <li>Suspendisse consequat</li>
-        <li>metus et viverra lacinia</li>
-        <li>velit justo consectetur ligula</li>
-        <li>lacinia cursus ante est quis orci</li>
-        <li>Nullam eleifend ultrices erat ut aliquam</li>
-        <li>Quisque non leo nulla</li>
+        <li ng-repeat="i in details.ingredients">{{ i }}</li>
       </ul>
     </div>
   </div>
@@ -37,37 +24,38 @@
       <h3 style="display: inline-block;margin-right: 10px">
         Ocena klientów:
       </h3>
-      <h4 style="display: inline-block">
-        <span class="glyphicon glyphicon-star rating-glyph"></span>
-        <span class="glyphicon glyphicon-star rating-glyph"></span>
-        <span class="glyphicon glyphicon-star rating-glyph"></span>
-        <span class="glyphicon glyphicon-star-empty rating-glyph"></span>
-        <span class="glyphicon glyphicon-star-empty rating-glyph"></span>
+      <h4 style="display: inline-block;white-space: nowrap" ng-hide="comments.length == 0">
+        <span class="glyphicon glyphicon-star rating-glyph" ng-repeat="i in range(1,rating)"></span><!--
+     --><span class="glyphicon glyphicon-star-empty rating-glyph" ng-repeat="i in range(rating+1,5)"></span>
+      </h4>
+      <h4 style="display: inline-block;white-space: nowrap" ng-hide="comments.length > 0">
+        Brak ocen
       </h4>
     </div>
     <div class="col-lg-12">
       <h3>
-        Komentarze <button data-toggle="collapse" data-target="#comments" class="btn btn-default">Zwiń/rozwiń</button>
+        Komentarze
+        <button data-toggle="collapse" data-target="#comments" class="btn btn-default">Zwiń/rozwiń</button>
       </h3>
 
       <div id="comments" class="collapse">
-        <form class="form-horizontal">
+        <form class="form-horizontal" ng-submit="addComment()">
           <div class="form-group">
             <label for="name" class="col-sm-2 control-label">Pseudonim</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="name" placeholder="Pseudonim">
+              <input type="text" class="form-control" id="name" placeholder="Pseudonim" ng-model="commentName" required>
             </div>
           </div>
           <div class="form-group">
             <label for="text" class="col-sm-2 control-label">Treść</label>
             <div class="col-sm-10">
-              <textarea rows="3" class="form-control" id="text" placeholder="Treść"></textarea>
+              <textarea rows="3" class="form-control" id="text" placeholder="Treść" ng-model="commentText" required></textarea>
             </div>
           </div>
           <div class="form-group">
             <label for="dish-rating" class="col-sm-2 control-label">Twoja ocena</label>
             <div class="col-sm-10" style="padding-top: 8px">
-              <input type="hidden" class="rating" id="dish-rating" style=""/>
+              <input type="hidden" class="rating" id="dish-rating" style="" value="3"/>
             </div>
           </div>
           <div class="form-group">
@@ -81,25 +69,30 @@
         </script>
 
 
-        <div class="row" style="background-color: rgb(245, 245, 245); margin: 5px; border-radius: 10px">
-          <!-- ng-repeat-->
+        <div class="row" style="background-color: rgb(245, 245, 245); margin: 5px; border-radius: 10px"
+        ng-repeat="c in paginatedComments | orderBy:'timestamp':true">
           <div class="col-md-6 col-sm-12 col-xs-12">
-            <h4 style="color: #814f22;display: inline-block;margin-right: 10px">Nazwa użytkownika</h4>
-            <span class="glyphicon glyphicon-star rating-glyph"></span>
-            <span class="glyphicon glyphicon-star rating-glyph"></span>
-            <span class="glyphicon glyphicon-star rating-glyph"></span>
-            <span class="glyphicon glyphicon-star-empty rating-glyph"></span>
-            <span class="glyphicon glyphicon-star-empty rating-glyph"></span>
+            <h4 style="color: #814f22;display: inline-block;margin-right: 10px">{{c.name}}</h4>
+            <div style="white-space: nowrap; display: inline-block;">
+              <span class="glyphicon glyphicon-star rating-glyph" ng-repeat="i in range(1,c.rating)"></span><!--
+              --><span class="glyphicon glyphicon-star-empty rating-glyph" ng-repeat="i in range(c.rating+1,5)"></span>
+            </div>
           </div>
           <div class="col-md-6 col-sm-12 col-xs-12" style="height: 100%; vertical-align: bottom"><h5 class="pull-right">
-            5
-            grudnia 2016, 10:30</h5></div>
+            {{c.timestamp | polishDateTime}}</h5></div>
           <div class="col-md-12">
             <p>
-              Vivamus tristique erat vestibulum eleifend suscipit. Pellentesque non porttitor lorem, vitae scelerisque
-              urna. Nulla sed mi quis ante porttitor dictum ut id augue. Donec est arcu, mattis id nulla at, ultricies
-              fringilla nulla.
+              {{c.text}}
             </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="text-center col-lg-12">
+            <ul uib-pagination items-per-page="itemsPerPage" total-items="totalItems" ng-model="currentPage"
+                ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" max-size="5"
+                force-ellipses="true" boundary-links="true" first-text="&laquo;" last-text="&raquo;"
+                style="margin-top: 5px;" ng-hide="comments.length == 0"></ul>
+            <h4 ng-hide="comments.length > 0">Brak komentarzy</h4>
           </div>
         </div>
 

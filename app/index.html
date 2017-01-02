@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="restaurantApp" ng-controller="MainCtrl">
+<html lang="en" ng-app="restaurantApp" ng-controller="MainCtrl" xmlns="http://www.w3.org/1999/html">
 
 <head>
   <meta charset="utf-8">
@@ -10,6 +10,8 @@
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
   <link rel="stylesheet" href="css/app.css" type="text/css">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 
   <script type="text/javascript" src="js/lib/jquery-2.2.4.min.js"></script>
   <script type="text/javascript" src="js/lib/jquery-ui.js"></script>
@@ -49,7 +51,8 @@
         <li class="active"><a href="#top" class="nav-link">Home<span class="sr-only">(current)</span></a></li>
         <li><a href="#menu" class="nav-link">Menu</a></li>
         <li><a href="#book" class="nav-link">Zarezerwuj stolik</a></li>
-        <li><a href="#map" class="nav-link">Mapa dojazdu</a></li>
+        <li><a href="#mapSection" class="nav-link">Mapa dojazdu</a></li>
+        <li><a href="#contactSection" class="nav-link">Kontakt</a></li>
       </ul>
     </div>
 
@@ -153,12 +156,14 @@
                              popover-trigger="'mouseenter'"></span> </label>
             <div class="col-lg-3 col-md-3 col-sm-6">
               <input class="form-control" type="time" id="reservationBeginTime" ng-model="reservationBeginTime"
-                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required ng-change="loadTables()"/>
+                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required
+                     ng-change="loadTables()"/>
             </div>
             <div class="col-lg-3 col-md-3 col-sm-6"
                  ng-class="{'has-error': reservationBeginTime >= reservationEndTime}">
               <input class="form-control" type="time" id="reservationEndTime" ng-model="reservationEndTime"
-                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required ng-change="loadTables()"/>
+                     ng-disabled="reservedTables.length > 0" min="12:00:00" max="22:00:00" required
+                     ng-change="loadTables()"/>
             </div>
             <div class="col-lg-1" ng-show="isLoadingTables" style="padding-top: 8px;">
               <span class="glyphicon glyphicon-repeat fast-right-spinner"></span>
@@ -192,14 +197,17 @@
             </g>
           </svg>
         </figure>
-        <div id="table-availability" class="col-lg-11 col-md-11" style="border: 1px solid #333;border-radius: 5px;display: none;">
+        <div id="table-availability" class="col-lg-11 col-md-11"
+             style="border: 1px solid #333;border-radius: 5px;display: none;">
         </div>
       </div>
       <div class="col-lg-5 col-md-6 col-sm-6">
-        <div class="vertical-center" ng-hide="reservedTables.length > 0 && reservationBeginTime && reservationEndTime">
-          <h4 style="color: #777777">Aby rozpocząć rezerwację, wybierz datę i stolik</h4>
+        <div class="vertical-center" ng-hide="reservedTables.length > 0 && reservationBeginTime && reservationEndTime
+         || reservationFinished">
+          <h4 style="color: #777777" class="text-center">Aby rozpocząć rezerwację, wybierz datę i stolik</h4>
         </div>
-        <div ng-hide="reservedTables.length == 0  || !reservationBeginTime || !reservationEndTime">
+        <div
+            ng-hide="reservedTables.length == 0  || !reservationBeginTime || !reservationEndTime || reservationFinished">
           <h4 style="">Rezerwacja na dzień <strong>{{reservationDate | polishDate}}</strong>:</h4>
           <div>Wybrane stoliki ({{reservedTables.length}}):
             <div style="font-size: medium; margin-right: 5px;margin-bottom: 5px;display: inline-block"
@@ -208,7 +216,12 @@
        --></div>
           </div>
           <div>
-            <h5>Rezerwuj menu: (opcjonalne)</h5>
+            <h5 style="display: block;" class="col-md-6">Rezerwuj menu: (opcjonalne)</h5>
+            <div class="text-right col-md-6">
+              <select class="form-control input-sm" ng-model="selectedCategory.category"
+                      ng-options="category for category in selectableCategories" ng-change="pageChangedReserving()">
+              </select>
+            </div>
             <table class="table table-striped table-condensed">
               <tr ng-repeat="dish in filteredReservingMenu" ng-class="{success: reservedDishes[dish._id]}">
                 <td class="col-lg-11 col-md-11" style="margin-top: 5px;">
@@ -232,18 +245,18 @@
           </div>
           <div class="form-horizontal">
             <div class="form-group">
-              <label><input type="checkbox" name="checkbox" value="value" required> Akceptuję regulamin</label>
+              <label style="margin-left: 20px;"><input type="checkbox" name="checkbox" value="value" required> Akceptuję regulamin</label>
             </div>
             <div class="form-group">
               <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationEmail">E-mail:</label>
               <div class="col-lg-6 col-md-6 col-sm-6">
-                <input class="form-control" type="email" id="reservationEmail" ng-model="reservationEmail"/>
+                <input class="form-control" type="email" id="reservationEmail" ng-model="reservationEmail" required/>
               </div>
             </div>
             <div class="form-group">
-              <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationEmail">Telefon:</label>
+              <label class="col-lg-4 col-md-6 co-sm-12 control-label" for="reservationPhone">Telefon:</label>
               <div class="col-lg-6 col-md-6 col-sm-6">
-                <input class="form-control" type="text" id="reservationPhone" ng-model="reservationPhone"/>
+                <input class="form-control" type="text" id="reservationPhone" ng-model="reservationPhone" required/>
               </div>
             </div>
             <div class="form-group">
@@ -251,22 +264,95 @@
             </div>
           </div>
         </div>
+        <div ng-hide="!reservationFinished">
+          <h4 class="text-center">Twoja rezewacja została przyjęta</h4>
+          <p>Data rezerwacji: {{ reservationDate | polishDate }}</p>
+          <p>Przedział czasowy: {{ reservationBeginTime | date:'HH:mm' }} - {{ reservationEndTime | date:'HH:mm' }}</p>
+          Stolik(i):
+          <div style="font-size: medium; margin-right: 5px;margin-bottom: 5px;display: inline-block"
+               class="label label-success"
+               ng-repeat="reservedTable in reservedTables">#{{reservedTable}}<!--
+       --></div>
+          <br>
+          <div ng-hide="Object.getOwnPropertyNames(reservedDishes).length == 0">
+            Menu:
+            <ul>
+              <li ng-repeat="(dishId, selected) in reservedDishes" ng-if="selected">{{ getDishName(dishId) }}</li>
+            </ul>
+          </div>
+          <p>E-mail: {{ reservationEmail }}</p>
+          <p>Telefon: {{ reservationPhone }}</p>
+          <h4 class="text-center">
+            <input type="button" class="btn btn-primary" ng-click="beginNewReservation()"
+                   value="Rozpocznij nową rezerwację">
+          </h4>
+        </div>
       </div>
     </form>
   </div>
 </div>
 <div class="container-fluid main">
+  <div class="row" style="margin-bottom: 20px;margin-top: 30px">
+    <div class="col-lg-offset-2 col-lg-8">
+      <h1 class="text-center" id="mapSection">Mapa dojazdu</h1>
+      <div id="map" style="width: 100%; height: 500px;"></div>
+      <script>
+        function initMap() {
+          var pos = {lat: 50.064493, lng: 19.923557};
+          var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 13,
+            center: pos,
+            scrollwheel: false
+          });
+          var marker = new google.maps.Marker({
+            position: pos,
+            map: map
+          });
+        }
+      </script>
+      <script async defer
+              src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6UGuTHb0QeH5SAHa4xezKyyKHVbW82wI&callback=initMap">
+      </script>
+    </div>
+  </div>
+</div>
+<div class="container-fluid main">
   <div class="row" style="margin-bottom: 20px;margin-top: 10px">
-    <div class="col-lg-offset-1 col-lg-10">
-      <h1 class="text-center" id="map">Mapa dojazdu</h1>
-      <BR><BR><BR><BR>
-      <BR><BR><BR><BR>
-      <BR><BR><BR><BR>
-      <BR><BR><BR><BR>
+    <div class="col-lg-offset-2 col-lg-8">
+      <h1 class="text-center" id="contactSection" style="margin-bottom: 20px;">Kontakt</h1>
+      <div class="col-lg-4  text-center">
+        <span class="glyphicon glyphicon-home contact-glyph text-center" style="padding-right: 10px;"></span><br><br>
+        <address>
+          Restauracja AGH<br>
+          Al. Mickiewicza 30<br>
+          30-059 Kraków<br>
+        </address>
+      </div>
+      <div class="col-lg-4 text-center">
+        <span class="glyphicon glyphicon-earphone contact-glyph text-center"></span><br><br>
+        <address>
+          +48 12 123 45 67<br>
+          789 123 456
+        </address>
+      </div>
+      <div class="col-lg-4 text-center">
+        <span class="glyphicon glyphicon-envelope contact-glyph text-center" style="padding-top: 38px;"></span><br><br>
+        <address>
+          restauracja@example.com
+        </address>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="text-center" style="margin-top: 115px; margin-bottom: 115px;">
+  <div style="background: rgba(255, 255, 255, 0.5); border-radius: 7px; padding: 0;display: inline-block;"
+    class="text-center">
+    <p style="margin: 10px;color: #FFFFFF;text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">
+      &copy; 2017
+    </p>
+  </div>
+</div>
 <script type="text/javascript">
   var today = new Date();
   var dd = today.getDate();
@@ -292,6 +378,9 @@
     $("#menu-bg").css('top', -($(".menu").outerHeight() + scrolled) / 3.5 + 'px');
   }
 
+  window.onload = function () {
+    parallax();
+  };
   parallax();
   $(window).scroll(function (e) {
     parallax();
@@ -321,7 +410,6 @@
 
   });
 </script>
-<script type="text/javascript" src="js/tooltip.js"></script>
 </body>
 
 </html>

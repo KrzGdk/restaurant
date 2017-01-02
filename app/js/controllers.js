@@ -1,10 +1,17 @@
 var appControllers = angular.module('appControllers', []);
 
 appControllers.controller('MainCtrl',
-    function ($scope, $routeParams, $http, $filter, Menu, $uibModal, $uibTooltip, Reservations) {
+    function ($scope, $routeParams, $http, $filter, Menu, $uibModal, $uibTooltip, Reservations, Categories) {
         $scope.menu = Menu.query([], function () {
             $scope.pageChanged();
             $scope.pageChangedReserving();
+        });
+
+        Categories.getCategories().then(function (result) {
+            $scope.selectableCategories = result.data.map(function (c) {
+                return c.name;
+            });
+            $scope.selectableCategories.splice(0, 0, "Wszystkie kategorie");
         });
 
         // menu pagination
@@ -25,11 +32,12 @@ appControllers.controller('MainCtrl',
         $scope.filteredReservingMenu = $scope.menu.slice(0, $scope.reservingItemsPerPage);
         $scope.reservingCurrentPage = 1;
         $scope.totalItems = $scope.menu.length;
+        $scope.selectedCategory = {category: "Wszystkie kategorie"}
 
         $scope.pageChangedReserving = function paginate() {
             var begin = (($scope.reservingCurrentPage - 1) * $scope.reservingItemsPerPage), end = begin + $scope.reservingItemsPerPage;
-            $scope.totalItems = $scope.menu.length;
-            $scope.filteredReservingMenu = $scope.menu.slice(begin, end);
+            $scope.totalItems = $filter("categoryFilter")($scope.menu, $scope.selectedCategory).length;
+            $scope.filteredReservingMenu = $filter("categoryFilter")($scope.menu, $scope.selectedCategory).slice(begin, end);
             var mod = $scope.filteredReservingMenu.length % $scope.reservingItemsPerPage;
             while (mod != 0) {
                 $scope.filteredReservingMenu.push({name: ""});
@@ -53,6 +61,7 @@ appControllers.controller('MainCtrl',
         $scope.reservedDishes = {};
         $scope.reservationEmail = "";
         $scope.reservationPhone = "";
+        $scope.reservationFinished = false;
         $scope.isLoadingTables = false;
         $scope.takenTables = {};
         $scope.loadTables = function () {
@@ -67,6 +76,7 @@ appControllers.controller('MainCtrl',
             }
         };
         var parseReservations = function (reservations) {
+            $scope.takenTables = {};
             var disabledTablesArrays = reservations.map(function (r) {
                 return r.tables;
             });
@@ -116,6 +126,12 @@ appControllers.controller('MainCtrl',
             return n < 10 ? '0' + n.toString(10) : n.toString(10);
         }
 
+        $scope.getDishName = function (dishId) {
+            return $scope.menu.filter(function (d) {
+                return d._id == dishId;
+            })[0].name;
+        };
+
         $scope.addReservation = function () {
             Reservations.addReservation({
                 date: $scope.reservationDate,
@@ -128,8 +144,22 @@ appControllers.controller('MainCtrl',
                 email: $scope.reservationEmail,
                 phone: $scope.reservationPhone
             }).then(function success() {
+                $scope.reservationFinished = true;
                 $scope.loadTables();
             });
+        };
+
+        $scope.beginNewReservation = function () {
+            $scope.reservationDate = new Date();
+            $scope.reservationBeginTime = "";
+            $scope.reservationEndTime = "";
+            $scope.reservedTables = [];
+            resetMarkedTables();
+            $scope.reservedDishes = {};
+            $scope.reservationEmail = "";
+            $scope.reservationPhone = "";
+            $scope.reservationFinished = false;
+            $scope.loadTables();
         };
 
         $scope.markTable = function (i) {
@@ -141,10 +171,16 @@ appControllers.controller('MainCtrl',
                     t.addClass('table-svg-selected');
                 }
                 else {
-                    var index = $scope.reservedTables.indexOf(i)
+                    var index = $scope.reservedTables.indexOf(i);
                     $scope.reservedTables.splice(index, 1);
                     t.removeClass('table-svg-selected');
                 }
+            }
+        };
+
+        var resetMarkedTables = function () {
+            for (var i = 1; i <= 10; i++) {
+                $('#table' + i).removeClass('table-svg-selected');
             }
         };
 
@@ -170,15 +206,72 @@ appControllers.controller('MainCtrl',
         };
 
     })
-    .controller('DishModalCtrl', function ($scope, $uibModalInstance, dish) {
+    .controller('DishModalCtrl', function ($scope, $uibModalInstance, dish, Details, Comments, $filter) {
 
         $scope.dish = dish;
+        $scope.details = {};
+        $scope.commentName = "";
+        $scope.commentText = "";
+        $scope.comments = [];
+        Details.getDetails(dish._id).then(function (result) {
+            $scope.details = result.data;
+        });
+
+        $scope.itemsPerPage = 6;
+        $scope.paginatedComments = [];
+        $scope.currentPage = 1;
+        $scope.totalItems = 0;
+
+        $scope.pageChanged = function paginate() {
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage), end = begin + $scope.itemsPerPage;
+
+            $scope.totalItems = $scope.comments.length;
+            $scope.paginatedComments = $filter("orderBy")($scope.comments, "timestamp", true).slice(begin, end);
+        };
+
+        var loadComments = function () {
+            Comments.getComments(dish._id).then(function (result) {
+                $scope.comments = result.data;
+                for(var i = 0; i < $scope.comments.length; i++) {
+                    $scope.comments[i].timestamp = new Date($scope.comments[i].timestamp);
+                }
+                $scope.rating = Math.round(result.data.map(function (c) {
+                        return c.rating;
+                    }).reduce(function (p, c) {
+                        return p + c;
+                    }, 0) / $scope.comments.length) || 3;
+                $scope.pageChanged();
+            });
+        };
+
+
+        loadComments();
+
+        $scope.addComment = function () {
+            Comments.addComment({
+                dishId: dish._id,
+                name: $scope.commentName,
+                text: $scope.commentText,
+                rating: $('#dish-rating').val()
+            }).then(function () {
+                loadComments();
+                $scope.commentName = "";
+                $scope.commentText = "";
+            });
+        };
+
+
+        $scope.range = function(min, max, step) {
+            step = step || 1;
+            var input = [];
+            for (var i = min; i <= max; i += step) {
+                input.push(i);
+            }
+            return input;
+        };
 
         $scope.ok = function () {
             $uibModalInstance.close();
         };
 
-        $scope.cancel = function () {
-            $uibModalInstance.dismiss('cancel');
-        };
     });

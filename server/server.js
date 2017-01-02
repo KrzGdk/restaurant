@@ -7,7 +7,6 @@ var app = express();
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
-
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/restaurant");

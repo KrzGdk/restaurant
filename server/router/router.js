@@ -6,6 +6,7 @@ module.exports = function (websocket) {
     var fs = require('fs');
 
     var models = require('../model/init');
+    var reservations = require('../service/reservations');
     // router.use(require("../auth/auth"));  TODO turn on on deploy
 
     router.get('/', function (req, res) {
@@ -13,13 +14,33 @@ module.exports = function (websocket) {
     });
 
     router.get('/reservations', function (req, res) {
-        models.Reservation.find(function (err, db) {
+        reservations.findReservations(req.query, function (err, db) {
             if (err) throw err;
             res.send(db);
         });
     });
 
     router.post('/reservations', function (req, res) {
+        var date = new Date(req.body.date);
+        var beginTimeDate = new Date(req.body.beginTime);
+        var endTimeDate = new Date(req.body.endTime);
+        var hasValidationError = false;
+        reservations.findReservations({
+            date: date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear(),
+            beginTime: beginTimeDate.getHours() + ":" + beginTimeDate.getMinutes(),
+            endTime: endTimeDate.getHours() + ":" + endTimeDate.getMinutes()
+        }, function (err, db) {
+            if (err) throw err;
+            if (db && db.some(function (r) {
+                    return req.body.tables.indexOf(r.tables) >= 0;
+                })) {
+                hasValidationError = true;
+                res.status(400).send({validationError: "Niepoprawny termin rezerwacji"});
+            }
+        });
+        if (hasValidationError) {
+            return;
+        }
         var r = new models.Reservation();
         r.date = req.body.date;
         r.beginTime = req.body.beginTime;
@@ -36,44 +57,137 @@ module.exports = function (websocket) {
         });
     });
 
-    router.get('/dish-details', function (req, res) { // TODO dish-detail by dishId
-        models.Dish.find(function (err, db) {
+    router.get('/categories', function (req, res) {
+        models.Category.find({}, function (err, db) {
             if (err) throw err;
             res.send(db);
         })
     });
 
     router.get('/dish', function (req, res) {
-        models.Dish.find(function (err, db) {
+        models.Dish.find({
+            active: true
+        }, function (err, db) {
             if (err) throw err;
             res.send(db);
         })
     });
 
-    router.get('/init', function (req, res) {
-        var dishes = fs.readFileSync("init-data/menu.json");
+    router.get('/details', function (req, res) {
+        if (!req.query.d) {
+            res.status(400).send("No id supplied");
+            return;
+        }
+        models.Details.findOne({
+            dishId: req.query.d
+        }, function (err, db) {
+            if (err) throw err;
+            res.send(db);
+        })
+    });
+    
+    router.get('/comments', function (req, res) {
+        if (!req.query.d) {
+            res.status(400).send("No id supplied");
+            return;
+        }
+        models.Comment.find({
+            dishId: req.query.d
+        }, function (err, db) {
+            if (err) throw err;
+            res.send(db);
+        });
+    });
+
+    router.post('/comments', function (req, res) {
+        var comment = new models.Comment();
+        if (!req.body.dishId || !req.body.name || !req.body.text || !req.body.rating ||
+            req.body.dishId == "" || req.body.name == "" || req.body.text == "" || req.body.rating == "") {
+            res.sendStatus(400);
+            return;
+        }
+        comment.dishId = req.body.dishId;
+        comment.name = req.body.name;
+        comment.text = req.body.text;
+        comment.rating = parseInt(req.body.rating);
+        comment.save(function (err, c) {
+            if (err) res.sendStatus(500);
+            else {
+                res.sendStatus(200);
+            }
+        });
+    });
+
+    function addMenu() {
+        var dishes = fs.readFileSync("server/init-data/menu.json");
         dishes = JSON.parse(dishes);
         console.log(JSON.stringify(dishes));
         for (var i = 0; i < dishes.length; i++) {
-            var model = new models.Dish();
-            model.name = dishes[i].name;
-            model.thumbnail = dishes[i].thumbnail;
-            model.active = true;
+            var dish = new models.Dish();
+            dish.name = dishes[i].name;
+            dish.thumbnail = dishes[i].thumbnail;
+            dish.category = dishes[i].category;
+            dish.active = true;
+            console.log(dish);
+            dish.save(
+                (function (inner_i) {
+                    return function (err, dish) {
+                        if (err) console.error(err);
+                        else {
+                            console.log(dish);
+                            var details = new models.Details();
+                            details.dishId = dish._id;
+                            details.description = dishes[inner_i].details.description;
+                            details.ingredients = dishes[inner_i].details.ingredients;
+                            details.save(function (err, p) {
+                                if (err) console.error(err);
+                                else console.log(p);
+                            });
+                        }
+                    }
+                })(i)
+            );
+        }
+    }
+
+    function addCategories() {
+        var categories = fs.readFileSync("server/init-data/categories.json");
+        categories = JSON.parse(categories);
+        console.log(JSON.stringify(categories));
+        for (var i = 0; i < categories.length; i++) {
+            var model = new models.Category();
+            model.name = categories[i].name;
             console.log(model);
             model.save(function (err, p) {
                 if (err) console.error(err);
                 else console.log(p);
             });
         }
+    }
+
+    router.post('/init', function (req, res) {
+        addCategories();
+        addMenu();
         res.sendStatus(200);
     });
 
-    router.get('/menu-del', function (req, res) {
-        models.Dish.find({}).remove(function (err) {
-            if (err) res.sendStatus(400);
-            else res.sendStatus(200);
-        });
+    router.post('/reset', function (req, res) {
+        function removeAll(model) {
+            var hasError = false;
+            model.find({}).remove(function (err) {
+                if (err) hasError = true;
+            });
+            return hasError;
+        }
+        var hasErrors = [removeAll(models.Reservation), removeAll(models.Category),
+            removeAll(models.Details), removeAll(models.Dish)];
+        if (hasErrors.indexOf(true) != -1) {
+            res.status(500).send("error");
+        } else {
+            res.status(200).send("OK");
+        }
     });
+
     return router;
 
 };
