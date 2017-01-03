@@ -7,7 +7,7 @@ module.exports = function (websocket, upload) {
 
     var models = require('../model/init');
     var reservations = require('../service/reservations');
-    // router.use(require("../auth/auth"));  TODO turn on on deploy
+    router.use(require("../auth/auth"));
     router.post('/login', function (req, res) {
         if (req.session.user) {
             res.sendStatus(200);
@@ -25,10 +25,6 @@ module.exports = function (websocket, upload) {
     router.post('/logout', function (req, res) {
         req.session.user = null;
         res.sendStatus(200);
-    });
-
-    router.get('/', function (req, res) {
-        res.send('Hello World!')
     });
 
     router.get('/reservations', function (req, res) {

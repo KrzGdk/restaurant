@@ -1,6 +1,6 @@
 angular.module("shopAdminApp")
     .constant("authUrl", "http://localhost:3000/login")
-    .controller("AuthCtrl", function ($scope, $http, $location, authUrl) {
+    .controller("AuthCtrl", function ($scope, $http, $location, authUrl, Auth) {
 
         $scope.login = function () {
             authenticate($scope.username, $scope.password);
@@ -13,13 +13,18 @@ angular.module("shopAdminApp")
             }, {
                 withCredentials: true
             }).success(function (data) {
+                Auth.isLoggedIn = true;
                 $location.path("/main");
             }).error(function (error) {
                 $scope.authenticationError = error;
             });
-        }
+        };
+
+        $scope.go = function ( path ) {
+            $location.path( path );
+        };
     })
-    .controller("ReservationsCtrl", function ($scope, $http, $location, authUrl, Reservations) {
+    .controller("ReservationsCtrl", function ($scope, $http, $location, authUrl, Reservations, Auth) {
         Reservations.getReservations(new Date()).then(function (result) {
             $scope.reservations = result.data;
         });
@@ -27,6 +32,11 @@ angular.module("shopAdminApp")
         $scope.reloadReservations = function () {
             Reservations.getReservations($scope.reservationDate, $scope.reservationBeginTime, $scope.reservationEndTime).then(function (result) {
                 $scope.reservations = result.data;
+            }, function (resp) {
+                if (resp.status == 403) {
+                    Auth.isLoggedIn = false;
+                    $location.path('/').replace();
+                }
             });
         }
 
@@ -73,20 +83,35 @@ angular.module("shopAdminApp")
             if ($scope.dishId) {
                 Dish.editWithDetails($scope.dishId, $scope.dish, $scope.details, document.getElementById("exampleInputFile").files[0]).then(function () {
                     $location.path("menu");
+                }, function (resp) {
+                    if (resp.status == 403) {
+                        Auth.isLoggedIn = false;
+                        $location.path('/').replace();
+                    }
                 });
             } else {
                 Dish.addWithDetails($scope.dish, $scope.details, document.getElementById("exampleInputFile").files[0]).then(function () {
                     $location.path("menu");
+                }, function (resp) {
+                    if (resp.status == 403) {
+                        Auth.isLoggedIn = false;
+                        $location.path('/').replace();
+                    }
                 });
             }
 
         }
 
     })
-    .controller("MenuCtrl", function ($scope, $http, $location, authUrl, Menu, Categories, Dish) {
+    .controller("MenuCtrl", function ($scope, $http, $location, authUrl, Menu, Categories, Dish, Auth) {
         $scope.alerts = [];
         Dish.getAll().then(function (result) {
             $scope.menu = result.data;
+        }, function (resp) {
+            if (resp.status == 403) {
+                Auth.isLoggedIn = false;
+                $location.path('/').replace();
+            }
         });
         Categories.getCategories().then(function (result) {
             $scope.selectableCategories = result.data.map(function (c) {
@@ -100,11 +125,21 @@ angular.module("shopAdminApp")
         $scope.deactivate = function (dish) {
             Dish.deactivate(dish._id).then(function () {
                 dish.active = false;
+            }, function (resp) {
+                if (resp.status == 403) {
+                    Auth.isLoggedIn = false;
+                    $location.path('/').replace();
+                }
             })
         };
         $scope.activate = function (dish) {
             Dish.activate(dish._id).then(function () {
                 dish.active = true;
+            }, function (resp) {
+                if (resp.status == 403) {
+                    Auth.isLoggedIn = false;
+                    $location.path('/').replace();
+                }
             })
         };
 

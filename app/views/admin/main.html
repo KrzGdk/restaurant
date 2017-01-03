@@ -1,8 +1,18 @@
-<div class="text-center">
-<a class="btn btn-primary" href="#/menu" role="button">
-  <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Zarządzaj menu
-</a>
-<a class="btn btn-primary" href="#/reservations" role="button">
-  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Rezerwacje
-</a>
+<div class="container-fluid main">
+  <div class="row" style="margin-bottom: 20px;margin-top: 10px">
+    <div class="col-lg-offset-3 col-lg-6">
+      <div class="col-lg-6 text-center admin-glyph-div" ng-click="go('menu')">
+        <span class="glyphicon glyphicon-list-alt admin-glyph text-center" style="padding-right: 6px;"></span>
+        <h3>
+          Zarządzaj menu
+        </h3>
+      </div>
+      <div class="col-lg-6 text-center admin-glyph-div" ng-click="go('reservations')">
+        <span class="glyphicon glyphicon-calendar admin-glyph text-center" style="padding-left: 7px"></span>
+        <h3>
+          Rezerwacje
+        </h3>
+      </div>
+    </div>
+  </div>
 </div>

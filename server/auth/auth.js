@@ -5,22 +5,78 @@ var roles = [
             {
                 resource: "dish",
                 allowedMethods: ['GET']
+            },
+            {
+                resource: "details",
+                allowedMethods: ['GET']
+            },
+            {
+                resource: "dish-w-details",
+                allowedMethods: []
+            },
+            {
+                resource: "dish-all",
+                allowedMethods: []
+            },
+            {
+                resource: "categories",
+                allowedMethods: ['GET']
+            },
+            {
+                resource: "reservations",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "comments",
+                allowedMethods: ['GET', 'POST']
             }
         ]
-    }//,
-    // {
-    //     name: "admin",
-    //     permissions: [
-    //         {
-    //             resource: "products",
-    //             allowedMethods: ['*']
-    //         },
-    //         {
-    //             resource: "orders",
-    //             allowedMethods: ['*']
-    //         }
-    //     ]
-    // }
+    },
+    {
+        name: "admin",
+        permissions: [
+            {
+                resource: "dish-all",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "dish-w-details",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "dish",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "details",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "categories",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "reservations",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "comments",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "init",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "initUser",
+                allowedMethods: ['*']
+            },
+            {
+                resource: "reset",
+                allowedMethods: ['*']
+            }
+        ]
+    }
 ];
 
 var allowedResources = ["login", "logout", 'favicon.ico'];

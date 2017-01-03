@@ -177,3 +177,22 @@ input[type=date]::-webkit-inner-spin-button {
     padding-top: 37px;
     color: #35201d;
 }
+
+.admin-glyph{
+    height:2em;
+    width:2em;
+    border-radius:50%;
+    border:3px solid #a86946;
+    font-size: 80px;
+    padding-top: 37px;
+    color: #35201d;
+}
+
+.admin-glyph-div{
+    border-radius: 25px;
+    padding-top: 10px;
+}
+.admin-glyph-div:hover{
+    background-color: rgb(203, 167, 145);
+    cursor: pointer;
+}
