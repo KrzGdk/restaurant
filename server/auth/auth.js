@@ -29,6 +29,18 @@ var roles = [
             {
                 resource: "comments",
                 allowedMethods: ['GET', 'POST']
+            },
+            {
+                resource: "init",
+                allowedMethods: ['GET', 'POST']
+            },
+            {
+                resource: "initUser",
+                allowedMethods: ['GET', 'POST']
+            },
+            {
+                resource: "reset",
+                allowedMethods: ['GET', 'POST']
             }
         ]
     },
@@ -74,6 +86,18 @@ var roles = [
             {
                 resource: "reset",
                 allowedMethods: ['*']
+            },
+            {
+                resource: "init",
+                allowedMethods: ['GET', 'POST']
+            },
+            {
+                resource: "initUser",
+                allowedMethods: ['GET', 'POST']
+            },
+            {
+                resource: "reset",
+                allowedMethods: ['GET', 'POST']
             }
         ]
     }

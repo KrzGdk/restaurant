@@ -27,11 +27,28 @@ angular.module("shopAdminApp")
     .controller("ReservationsCtrl", function ($scope, $http, $location, authUrl, Reservations, Auth) {
         Reservations.getReservations(new Date()).then(function (result) {
             $scope.reservations = result.data;
+            $scope.pageChanged();
         });
+
+        //pagination
+        $scope.itemsPerPage = 10;
+        $scope.paginatedReservations = [];//$filter("categoryFilter")($scope.products, $scope.selectedCategory).slice(0, $scope.itemsPerPage);
+        $scope.currentPage = 1;
+        $scope.totalItems = 0;//$filter("categoryFilter")($scope.products, $scope.selectedCategory).length;
+
+        $scope.pageChanged = function paginate() {
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage)
+                , end = begin + $scope.itemsPerPage;
+
+            $scope.totalItems = $scope.reservations.length;
+            $scope.paginatedReservations = $scope.reservations.slice(begin, end);
+        };
+
         $scope.reservationDate = new Date();
         $scope.reloadReservations = function () {
             Reservations.getReservations($scope.reservationDate, $scope.reservationBeginTime, $scope.reservationEndTime).then(function (result) {
                 $scope.reservations = result.data;
+                $scope.pageChanged();
             }, function (resp) {
                 if (resp.status == 403) {
                     Auth.isLoggedIn = false;
@@ -103,16 +120,33 @@ angular.module("shopAdminApp")
         }
 
     })
-    .controller("MenuCtrl", function ($scope, $http, $location, authUrl, Menu, Categories, Dish, Auth) {
+    .controller("MenuCtrl", function ($scope, $http, $location, $filter, authUrl, Menu, Categories, Dish, Auth) {
         $scope.alerts = [];
         Dish.getAll().then(function (result) {
             $scope.menu = result.data;
+            $scope.pageChanged();
         }, function (resp) {
             if (resp.status == 403) {
                 Auth.isLoggedIn = false;
                 $location.path('/').replace();
             }
         });
+
+        //pagination
+        $scope.itemsPerPage = 10;
+        $scope.paginatedMenu = [];//$filter("categoryFilter")($scope.products, $scope.selectedCategory).slice(0, $scope.itemsPerPage);
+        $scope.currentPage = 1;
+        $scope.totalItems = 0;//$filter("categoryFilter")($scope.products, $scope.selectedCategory).length;
+
+        $scope.pageChanged = function paginate() {
+            var begin = (($scope.currentPage - 1) * $scope.itemsPerPage)
+                , end = begin + $scope.itemsPerPage;
+
+            var filtered = $filter("filter")($filter("categoryFilter")($scope.menu, $scope.selectedCategory), $scope.nameFilterField);
+            $scope.totalItems = filtered.length;
+            $scope.paginatedMenu = filtered.slice(begin, end);
+        };
+
         Categories.getCategories().then(function (result) {
             $scope.selectableCategories = result.data.map(function (c) {
                 return c.name;

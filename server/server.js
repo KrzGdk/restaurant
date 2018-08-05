@@ -13,6 +13,10 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/restaurant");
 
+var connect = require('connect');
+var serveStatic = require('serve-static');
+connect().use(serveStatic("app")).listen(80);
+
 var server = require('http' ).createServer(app);
 var websocket = require('socket.io').listen(server);
 websocket.on('connection', function (socket) { });
@@ -21,5 +25,5 @@ app.use(session({secret: 'sessionsecretzxhzrstve8rv9s5tr'}));
 app.use('/', require("./router/router")(websocket, upload));
 
 server.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
+    console.log('App running')
 });

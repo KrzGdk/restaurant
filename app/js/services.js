@@ -10,6 +10,9 @@ appServices.factory('Menu', ['$resource', function ($resource) {
 
 appServices.service('Reservations', function ($http, $httpParamSerializer) {
     this.getReservations = function (date, beginTime, endTime) {
+        if (!date) {
+            date = new Date();
+        }
         function pad(num) {
             return ('0' + num).slice(-2);
         }

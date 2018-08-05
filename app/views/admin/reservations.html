@@ -77,4 +77,12 @@
       </td>
     </tr>
   </table>
+  <div class="row">
+    <div class="text-center col-lg-12">
+      <ul uib-pagination items-per-page="itemsPerPage" total-items="totalItems" ng-model="currentPage"
+          ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" max-size="5"
+          force-ellipses="true" boundary-links="true" first-text="&laquo;" last-text="&raquo;"
+          style="margin-top: 5px;"></ul>
+    </div>
+  </div>
 </div>

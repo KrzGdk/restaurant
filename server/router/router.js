@@ -315,7 +315,7 @@ module.exports = function (websocket, upload) {
         }
     }
 
-    router.post('/init', function (req, res) {
+    router.get('/init', function (req, res) {
         addCategories();
         addMenu();
         res.sendStatus(200);
@@ -332,7 +332,7 @@ module.exports = function (websocket, upload) {
         res.sendStatus(200);
     });
 
-    router.post('/reset', function (req, res) {
+    router.get('/reset', function (req, res) {
         function removeAll(model) {
             var hasError = false;
             model.find({}).remove(function (err) {
